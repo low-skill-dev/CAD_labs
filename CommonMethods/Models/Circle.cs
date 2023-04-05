@@ -6,9 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace GraphicLibrary.Models;
-public class Circle: ALinearElement
+public sealed class Circle : ALinearElement
 {
-	public Point Center { get; init; }
+	#region self-contained
+	public Point Center { get; private set; }
 	public int Radius { get; init; }
 
 	// 16. Штриховая линия 8: линия из 4-х пикселей, пропуск 4-х пикселей…
@@ -29,11 +30,11 @@ public class Circle: ALinearElement
 		}
 	}
 
-	private static int GetCirleRadius(Point center, Point onCirle)
+	public static float GetCirleRadius(Point center, Point onCirle)
 	{
 		var dX = onCirle.X - center.X;
 		var dY = onCirle.Y - center.Y;
-		return (int)MathF.Sqrt(dX * dX + dY * dY);
+		return MathF.Sqrt(dX * dX + dY * dY);
 	}
 
 	// by predefined radius
@@ -48,8 +49,23 @@ public class Circle: ALinearElement
 
 	// by center and point on circle
 	public Circle(System.Drawing.Point center, System.Drawing.Point onCircle, Color color, IEnumerator<bool>? patternResolver = null)
-		: this(center, GetCirleRadius(center, onCircle),color, patternResolver) { }
+		: this(center, (int)GetCirleRadius(center, onCircle),color, patternResolver) { }
 	public Circle(System.Windows.Point center, System.Windows.Point onCircle, Color color, IEnumerator<bool>? patternResolver = null)
 		: this(Common.WindowsToDrawing(center), Common.WindowsToDrawing(onCircle), color, patternResolver) { }
+	#endregion
 
+	#region inherited or overriden
+	public override IGraphicalElement Clone()
+	{
+		return new Circle(this.Center,this.Radius,this.Color,this.PatternResolver);
+	}
+	public override void MoveCoordinates(int dX, int dY)
+	{
+		this.Center += new Size(dX, dY);
+	}
+	public override void Rotate(float angleR, Point relativeTo) // basically rotate the center
+	{
+		this.Center = Common.RotatePoint(this.Center,relativeTo,angleR);
+	}
+	#endregion
 }

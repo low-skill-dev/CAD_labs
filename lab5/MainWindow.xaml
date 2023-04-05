@@ -3,10 +3,60 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:lab5"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
+	<Grid>
+		<StackPanel Orientation="Vertical">
+			<StackPanel Orientation="Horizontal">
+				<StackPanel Orientation="Vertical" Width="350" Margin="5">
+					<Label HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Рисование</Label>
+					<TextBox Name="DebugOut" Width="350" HorizontalAlignment="Center" FontSize="16" IsReadOnly="True">Status will be here...</TextBox>
+					<Button Width="350" Name="LoopButton" Click="LoopButton_Click" FontSize="16">Замкнуть</Button>
+					<Button Width="350" Name="ClearButton" Click="ClearButton_Click" FontSize="16">Очистить</Button>
+				</StackPanel>
 
-    </Grid>
+				<StackPanel Orientation="Vertical" Width="300" Margin="5">
+					<Label HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Поворот</Label>
+					<StackPanel Orientation="Horizontal">
+						<Label FontSize="16">Угол поворота (градусов)</Label>
+						<TextBox Name="RotateAngleIn" Width="103"  FontSize="16"></TextBox>
+					</StackPanel>
+					<StackPanel Orientation="Horizontal">
+						<Label FontSize="16">Относительно точки</Label>
+						<Label FontSize="16">X</Label>
+						<TextBox Name="relX" Width="50"  FontSize="16"></TextBox>
+						<Label FontSize="16">Y</Label>
+						<TextBox Name="relY" Width="50"  FontSize="16"></TextBox>
+					</StackPanel>
+					<StackPanel>
+						<DockPanel HorizontalAlignment="Center">
+							<Button Name="RotateButton" Click="RotateButton_Click" Margin="0,0,5,0" FontSize="16">Повернуть</Button>
+							<Button  Name="DuplicateRotated" Click="DuplicateRotated_Click" FontSize="16">Дублировать c поворотом</Button>
+						</DockPanel>
+					</StackPanel>
+				</StackPanel>
+				<StackPanel Orientation="Vertical" Width="250" Margin="5">
+					<Label HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Смещение</Label>
+					<StackPanel Orientation="Horizontal">
+						<Label FontSize="16">смещение по X</Label>
+						<TextBox Name="diffX" Width="53" Margin="75,0,0,0" FontSize="16"/>
+					</StackPanel>
+					<StackPanel Orientation="Horizontal">
+						<Label FontSize="16">смещение по Y</Label>
+						<TextBox Name="diffY" Width="53"  Margin="75,0,0,0"  FontSize="16"/>
+					</StackPanel>
+					<Button Name="MoveButton" Click="MoveButton_Click"  FontSize="16">Сместить</Button>
+				</StackPanel>
+				<StackPanel Orientation="Vertical" Width="250" Margin="5">
+					<Label HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Масштабирование</Label>
+					<StackPanel Orientation="Horizontal">
+						<Label FontSize="16">Коэф. (0.0001 -> 100)</Label>
+						<TextBox Name="ScaleIn" Width="53" Margin="34,0,0,0"  FontSize="16"/>
+					</StackPanel>
+					<Button Name="ScaleButton" Click="ScaleButton_Click" FontSize="16">Задать</Button>
+				</StackPanel>
+			</StackPanel>
+			<Image Name="ShowedImage" Width="1200" Height="500" Margin="0,10,0,0" MouseDown="ShowedImage_Click"></Image>
+		</StackPanel>
+	</Grid>
 </Window>

@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 namespace GraphicLibrary.Models;
 public class Line : ALinearElement
 {
-	public Point Start { get; init; }
-	public Point End { get; init; }
+	public Point Start { get; private set; }
+	public Point End { get; private set; }
 
 	// 16. Штрихпунктирная линия 8: линия из 3-х пикселей, пропуск 3-х пикселей, пиксель, пропуск 3-х пикселей…
 	public static IEnumerator<bool> GetPatternResolver16()
@@ -45,4 +45,21 @@ public class Line : ALinearElement
 	public Line(System.Windows.Point start, System.Windows.Point end, Color color, IEnumerator<bool>? patternResolver = null)
 		: this(Common.WindowsToDrawing(start), Common.WindowsToDrawing(end), color, patternResolver) { }
 
+	#region inherited or overriden
+	public override IGraphicalElement Clone()
+	{
+		return new Line(this.Start,this.End,this.Color,this.PatternResolver);
+	}
+	public override void MoveCoordinates(int dX, int dY)
+	{
+		this.Start += new Size(dX, dY);
+		this.End += new Size(dX, dY);
+	}
+	public override void Rotate(float angleR, Point relativeTo)
+	{
+		this.Start = Common.RotatePoint(this.Start, relativeTo, angleR);
+		this.End = Common.RotatePoint(this.End, relativeTo, angleR);
+		return;
+	}
+	#endregion
 }

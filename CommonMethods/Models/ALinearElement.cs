@@ -7,10 +7,16 @@ using System.Threading.Tasks;
 
 namespace GraphicLibrary.Models;
 
-public abstract class ALinearElement
+public abstract class ALinearElement : IGraphicalElement
 {
 	public Color Color { get; init; }
 	public IEnumerator<bool> PatternResolver { get; init; }
+
+	#region IGraphicalElement
+	public abstract void MoveCoordinates(int dX, int dY);
+	public abstract void Rotate(float angleR, Point relativeTo);
+	public abstract IGraphicalElement Clone();
+	#endregion
 
 	// solid line
 	public static IEnumerator<bool> GetDefaultPatternResolver()

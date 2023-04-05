@@ -6,5 +6,15 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
+	
+
+	<ItemGroup>
+		<PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+	</ItemGroup>
+	
+
+	<ItemGroup>
+	  <ProjectReference Include="..\CommonMethods\GraphicLibrary.csproj" />
+	</ItemGroup>
 
 </Project>
