@@ -6,21 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace GraphicLibrary.Models;
-public class Line
+public class Line : ALinearElement
 {
 	public Point Start { get; init; }
 	public Point End { get; init; }
-	public Color Color { get; init; }
-	public IEnumerator<bool> PatternResolver { get; init; }
 
-
-	// solid line
-	public static IEnumerator<bool> GetDefaultResolver()
-	{
-		while(true) yield return true;
-	}
 	// 16. Штрихпунктирная линия 8: линия из 3-х пикселей, пропуск 3-х пикселей, пиксель, пропуск 3-х пикселей…
-	public static IEnumerator<bool> GetResolver16()
+	public static IEnumerator<bool> GetPatternResolver16()
 	{
 		int i;
 		while(true) {
@@ -31,19 +23,26 @@ public class Line
 		}
 	}
 
+	// 16. Штриховая линия с разными штрихами 8: линия из 2-х пикселей, пропуск 4-х пикселей, линия из 3-х пикселей, пропуск 4-х пикселей…
+	public static IEnumerator<bool> GetBresenhamPatternResolver16()
+	{
+		int i;
+		while(true) {
+			for(i = 0; i < 2; i++) yield return true; // линия из 2-х пикселей
+			for(i = 0; i < 4; i++) yield return false; // пропуск 4-х пикселей
+			for(i = 0; i < 3; i++) yield return true; // линия из 3-х пикселей
+			for(i = 0; i < 4; i++) yield return false; // пропуск 4-х пикселей
+		}
+	}
+
 	public Line(System.Drawing.Point start, System.Drawing.Point end, Color color, IEnumerator<bool>? patternResolver = null)
+		: base(color, patternResolver)
 	{
 		this.Start = start;
 		this.End = end;
-		this.Color = color;
-		this.PatternResolver = patternResolver ?? GetDefaultResolver();
 	}
 
 	public Line(System.Windows.Point start, System.Windows.Point end, Color color, IEnumerator<bool>? patternResolver = null)
-		: this(
-			  new System.Drawing.Point((int)start.X, (int)start.Y),
-			  new System.Drawing.Point((int)end.X, (int)end.Y),
-			  color, patternResolver)
-	{ }
+		: this(Common.WindowsToDrawing(start), Common.WindowsToDrawing(end), color, patternResolver) { }
 
 }

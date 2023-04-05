@@ -24,4 +24,7 @@ public class Common
 			return bitmapimage;
 		}
 	}
+
+	public static Point WindowsToDrawing(System.Windows.Point p)
+		=> new System.Drawing.Point((int)p.X, (int)p.Y);
 }

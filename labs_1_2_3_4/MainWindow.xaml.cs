@@ -92,10 +92,27 @@ namespace lab1
 
 				var p1 = new System.Drawing.Point((int)prevPoint.Value.X, (int)prevPoint.Value.Y);
 				var p2 = new System.Drawing.Point((int)pos.X, (int)pos.Y);
-				if(isPatternValid())
-					_drawer.AddLine(p1, p2, null, CreateUserResolver());
-				else
-					_drawer.AddLine(p1, p2, null, GraphicLibrary.Models.Line.GetResolver16());
+				if(isPatternValid()) {
+					if((isSimpleLine.IsChecked ?? false) || (isBresLine.IsChecked ?? false)) {
+						_drawer.AddLine(p1, p2, null, CreateUserResolver());
+					} else
+					if((isSimpleCircle.IsChecked ?? false) || (isBresCircle.IsChecked ?? false)) {
+						_drawer.AddCircle(p1, p2, null, CreateUserResolver());
+					}
+				} else {
+					if(isSimpleLine.IsChecked ?? false) {
+						_drawer.AddLine(p1, p2, null, GraphicLibrary.Models.Line.GetPatternResolver16());
+					}
+					else if(isBresLine.IsChecked ?? false) {
+						_drawer.AddLine(p1, p2, null, GraphicLibrary.Models.Line.GetBresenhamPatternResolver16());
+					}
+					else if(isSimpleCircle.IsChecked ?? false) {
+						_drawer.AddCircle(p1, p2, null, GraphicLibrary.Models.Circle.GetPatternResolver16());
+					} 
+					else if(isBresCircle.IsChecked ?? false) {
+						_drawer.AddCircle(p1, p2, null, GraphicLibrary.Models.Circle.GetBresenhamPatternResolver16());
+					}
+				}
 				_drawer.RenderFrame();
 				ShowedImage.Source = _drawer.CurrentFrameImage;
 				_currentState = States.WaitingFirstPoint;
