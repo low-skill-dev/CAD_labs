@@ -13,6 +13,15 @@ public class CommonTests
 	#region Rotate
 	private static Point rel = new Point(0, 0);
 
+	private static PointF Round2(PointF point)
+	{
+		return new PointF(Round(point.X, 2), Round(point.Y, 2));
+	}
+	private static PointF RoundP(PointF point)
+	{
+		return new PointF(Round(point.X), Round(point.Y));
+	}
+
 	[Fact]
 	public void CanRotate0()
 	{
@@ -35,7 +44,7 @@ public class CommonTests
 		var expected = new Point(10, 10);
 		var actual = Common.RotatePoint(p1, rel, angle);
 
-		Assert.Equal(expected, actual);
+		Assert.Equal(expected, RoundP(actual));
 	}
 
 	[Fact]
@@ -47,19 +56,19 @@ public class CommonTests
 		var expected = new Point(0, 10);
 		var actual = Common.RotatePoint(p1, rel, angle);
 
-		Assert.Equal(expected, actual);
+		Assert.Equal(expected, Round2(actual));
 	}
 
 	[Fact]
 	public void CanRotate180()
 	{
-		var p1 = new Point(10, 10);
+		var p1 = new PointF(10, 10);
 		var angle = PI; // 180 deg
 
 		var expected = new Point(-10, -10);
 		var actual = Common.RotatePoint(p1, rel, angle);
 
-		Assert.Equal(expected, actual);
+		Assert.Equal(expected, Round2(actual));
 	}
 
 	[Fact]
@@ -71,7 +80,7 @@ public class CommonTests
 		var expected = new Point(5, 10); // part 1
 		var actual = Common.RotatePoint(p1, rel, angle);
 
-		Assert.Equal(expected, actual);
+		Assert.Equal(expected, Round2(actual));
 	}
 
 
@@ -101,7 +110,7 @@ public class CommonTests
 		var expected = new Point(rel.X-relY, rel.Y + relX);
 
 		Assert.Equal(expected, new Point(600 + 20, 250 - 49));
-		Assert.Equal(expected, actual);
+		Assert.Equal(expected, Round2(actual));
 	}
 
 
@@ -119,7 +128,7 @@ public class CommonTests
 		var p2e = new Point(10, 5);
 
 		//Assert.Equal(p1e, line.Start);
-		Assert.Equal(p2e, line.End);
+		Assert.Equal(Round2(p2e), Round2(line.End));
 	}
 
 
@@ -127,8 +136,8 @@ public class CommonTests
 	[Fact]
 	public void CanRotateLine_2()
 	{
-		var p1 = new Point(-1000, 1000);
-		var p2 = new Point(1000, 1000);
+		var p1 = new PointF(-1000, 1000);
+		var p2 = new PointF(1000, 1000);
 
 		Line line = new(p1, p2, System.Drawing.Color.White);
 
@@ -137,11 +146,11 @@ public class CommonTests
 
 		line.Rotate(angleR, rel);
 
-		var p1e = new Point(-1000, -1000);
-		var p2e = new Point(-1000, 1000);
+		var p1e = new PointF(-1000, -1000);
+		var p2e = new PointF(-1000, 1000);
 
-		Assert.Equal(p1e, line.Start);
-		Assert.Equal(p2e, line.End);
+		Assert.Equal(p1e, Round2(line.Start));
+		Assert.Equal(p2e, Round2(line.End));
 	}
 
 
@@ -149,9 +158,9 @@ public class CommonTests
 	[Fact]
 	public void CanRotateLine_3()
 	{
-		var p1 = new Point(-1000, 2000);
-		var p2 = new Point(1000, 2000);
-		var rel = new Point(0, 1000);
+		var p1 = new PointF(-1000, 2000);
+		var p2 = new PointF(1000, 2000);
+		var rel = new PointF(0, 1000);
 
 		Line line = new(p1, p2, System.Drawing.Color.White);
 
@@ -160,18 +169,18 @@ public class CommonTests
 
 		line.Rotate(angleR, rel);
 
-		var p1e = new Point(-1000, 0);
-		var p2e = new Point(-1000, 2000);
+		var p1e = new PointF(-1000, 0);
+		var p2e = new PointF(-1000, 2000);
 
-		Assert.Equal(p1e, line.Start);
-		Assert.Equal(p2e, line.End);
+		Assert.Equal(Round2(p1e), Round2(line.Start));
+		Assert.Equal(Round2(p2e), Round2(line.End));
 
 		line.Rotate(angleR, rel);
 		line.Rotate(angleR, rel);
 		line.Rotate(angleR, rel);
 
-		Assert.Equal(p1, line.Start);
-		Assert.Equal(p2, line.End);
+		Assert.Equal(Round2(p1), Round2(line.Start));
+		Assert.Equal(Round2(p2), Round2(line.End));
 	}
 	#endregion
 

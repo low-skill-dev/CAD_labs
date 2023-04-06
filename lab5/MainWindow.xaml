@@ -53,6 +53,13 @@
 						<Label FontSize="16">Коэф. (0.0001 -> 100)</Label>
 						<TextBox Name="ScaleIn" Width="53" Margin="34,0,0,0"  FontSize="16"/>
 					</StackPanel>
+					<StackPanel Orientation="Horizontal">
+						<Label FontSize="16">Относительно</Label>
+						<Label FontSize="16">X</Label>
+						<TextBox Name="relXscale" Width="49"  FontSize="16"></TextBox>
+						<Label FontSize="16">Y</Label>
+						<TextBox Name="relYscale" Width="49"  FontSize="16"></TextBox>
+					</StackPanel>
 					<Button Name="ScaleButton" Click="ScaleButton_Click" FontSize="16">Задать</Button>
 				</StackPanel>
 			</StackPanel>

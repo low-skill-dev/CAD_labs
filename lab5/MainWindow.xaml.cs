@@ -32,6 +32,9 @@ public partial class MainWindow : Window
 	private Point? _prevPoint;
 	private Point? _firstPoint;
 
+	private Point _center => new(ShowedImage.Width / 2, ShowedImage.Height / 2);
+
+
 	public MainWindow()
 	{
 		InitializeComponent();
@@ -43,16 +46,14 @@ public partial class MainWindow : Window
 		_drawer.RenderFrame();
 		this.ShowedImage.Source = Common.BitmapToImageSource(_drawer.CurrentFrame);
 
-		relX.Text = ((int)(this.ShowedImage.Width / 2)).ToString();
-		relY.Text = ((int)(this.ShowedImage.Height / 2)).ToString();
-
-		DebugOut.Text = $"Ожидание первой точки.";
+		relX.Text= relXscale.Text = _center.X.ToString();
+		relY.Text= relYscale.Text = _center.Y.ToString();
 	}
 
 	private void ClearButton_Click(object sender, RoutedEventArgs e)
 	{
 		_drawer.Reset();
-		_drawer.AddPoint(new((int)(this.ShowedImage.Width / 2), (int)(this.ShowedImage.Height / 2)), System.Drawing.Color.LightCoral);
+
 		_drawer.RenderFrame();
 		ShowedImage.Source = _drawer.CurrentFrameImage;
 
@@ -132,7 +133,7 @@ public partial class MainWindow : Window
 			return;
 		}
 
-		float angleR = angleD * float.Pi/180;
+		float angleR = angleD * float.Pi / 180;
 
 		_drawer.RotateAll(angleR, relativeTo.Value);
 		_drawer.RenderFrame();
@@ -172,14 +173,34 @@ public partial class MainWindow : Window
 
 		float angleR = angleD * float.Pi / 180;
 
-		_drawer.RotateAll(angleR, relativeTo.Value,true);
-		_drawer.RenderFrame();
-		ShowedImage.Source = _drawer.CurrentFrameImage;
+		Task.Run(() => {
+			_drawer.RotateAll(angleR, relativeTo.Value, true);
+			_drawer.RenderFrame();
+			ShowedImage.Source = _drawer.CurrentFrameImage;
+		});
 	}
 
 	private void ScaleButton_Click(object sender, RoutedEventArgs e)
 	{
-		// увелич радиус от относительной точки
+		Point? relativeTo = null;
+		try {
+			relativeTo = new(int.Parse(relXscale.Text), int.Parse(relYscale.Text));
+		} catch {
+			relativeTo = _center;
+		}
+
+
+		float scale;
+		try {
+			scale = float.Parse(ScaleIn.Text.Replace(',', '.'), CultureInfo.InvariantCulture) % 360;
+			if(scale < 0.0001 || scale > 1000) return;
+		} catch {
+			return;
+		}
+
+		_drawer.ScaleAll(scale, Common.WindowsToDrawing(relativeTo.Value));
+		_drawer.RenderFrame();
+		ShowedImage.Source = _drawer.CurrentFrameImage;
 	}
 }
 

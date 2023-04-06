@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 namespace GraphicLibrary.Models;
 public class Line : ALinearElement
 {
-	public Point Start { get; private set; }
-	public Point End { get; private set; }
+	public PointF Start { get; private set; }
+	public PointF End { get; private set; }
 
 	// 16. Штрихпунктирная линия 8: линия из 3-х пикселей, пропуск 3-х пикселей, пиксель, пропуск 3-х пикселей…
 	public static IEnumerator<bool> GetPatternResolver16()
@@ -35,7 +35,7 @@ public class Line : ALinearElement
 		}
 	}
 
-	public Line(System.Drawing.Point start, System.Drawing.Point end, Color color, IEnumerator<bool>? patternResolver = null)
+	public Line(System.Drawing.PointF start, System.Drawing.PointF end, Color color, IEnumerator<bool>? patternResolver = null)
 		: base(color, patternResolver)
 	{
 		this.Start = start;
@@ -48,18 +48,22 @@ public class Line : ALinearElement
 	#region inherited or overriden
 	public override IGraphicalElement Clone()
 	{
-		return new Line(this.Start,this.End,this.Color,this.PatternResolver);
+		return new Line(this.Start, this.End, this.Color, this.PatternResolver);
 	}
-	public override void MoveCoordinates(int dX, int dY)
+	public override void MoveCoordinates(float dX, float dY)
 	{
-		this.Start += new Size(dX, dY);
-		this.End += new Size(dX, dY);
+		this.Start += new SizeF(dX, dY);
+		this.End += new SizeF(dX, dY);
 	}
-	public override void Rotate(float angleR, Point relativeTo)
+	public override void Rotate(float angleR, PointF relativeTo)
 	{
 		this.Start = Common.RotatePoint(this.Start, relativeTo, angleR);
 		this.End = Common.RotatePoint(this.End, relativeTo, angleR);
-		return;
+	}
+	public override void Scale(float scale, PointF relativeTo)
+	{
+		this.Start = Common.ScalePoint(Start, relativeTo, scale);
+		this.End = Common.ScalePoint(End, relativeTo, scale);
 	}
 	#endregion
 }

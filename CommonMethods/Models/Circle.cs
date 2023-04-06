@@ -9,8 +9,8 @@ namespace GraphicLibrary.Models;
 public sealed class Circle : ALinearElement
 {
 	#region self-contained
-	public Point Center { get; private set; }
-	public int Radius { get; init; }
+	public PointF Center { get; private set; }
+	public float Radius { get; private set; }
 
 	// 16. Штриховая линия 8: линия из 4-х пикселей, пропуск 4-х пикселей…
 	public static IEnumerator<bool> GetPatternResolver16()
@@ -24,21 +24,13 @@ public sealed class Circle : ALinearElement
 	// 16. Линия сплошная.
 	public static IEnumerator<bool> GetBresenhamPatternResolver16()
 	{
-		int i;
 		while(true) {
 			 yield return true; // Линия сплошная.
 		}
 	}
 
-	public static float GetCirleRadius(Point center, Point onCirle)
-	{
-		var dX = onCirle.X - center.X;
-		var dY = onCirle.Y - center.Y;
-		return MathF.Sqrt(dX * dX + dY * dY);
-	}
-
 	// by predefined radius
-	public Circle(System.Drawing.Point center, int radius, Color color, IEnumerator<bool>? patternResolver = null)
+	public Circle(System.Drawing.PointF center, float radius, Color color, IEnumerator<bool>? patternResolver = null)
 		: base(color, patternResolver)
 	{
 		this.Center = center;
@@ -48,8 +40,8 @@ public sealed class Circle : ALinearElement
 		: this(Common.WindowsToDrawing(center), radius, color, patternResolver) { }
 
 	// by center and point on circle
-	public Circle(System.Drawing.Point center, System.Drawing.Point onCircle, Color color, IEnumerator<bool>? patternResolver = null)
-		: this(center, (int)GetCirleRadius(center, onCircle),color, patternResolver) { }
+	public Circle(System.Drawing.PointF center, System.Drawing.PointF onCircle, Color color, IEnumerator<bool>? patternResolver = null)
+		: this(center, Common.GetCirleRadius(center, onCircle),color, patternResolver) { }
 	public Circle(System.Windows.Point center, System.Windows.Point onCircle, Color color, IEnumerator<bool>? patternResolver = null)
 		: this(Common.WindowsToDrawing(center), Common.WindowsToDrawing(onCircle), color, patternResolver) { }
 	#endregion
@@ -59,13 +51,18 @@ public sealed class Circle : ALinearElement
 	{
 		return new Circle(this.Center,this.Radius,this.Color,this.PatternResolver);
 	}
-	public override void MoveCoordinates(int dX, int dY)
+	public override void MoveCoordinates(float dX, float dY)
 	{
-		this.Center += new Size(dX, dY);
+		this.Center += new SizeF(dX, dY);
 	}
-	public override void Rotate(float angleR, Point relativeTo) // basically rotate the center
+	public override void Rotate(float angleR, PointF relativeTo) // basically rotate the center
 	{
 		this.Center = Common.RotatePoint(this.Center,relativeTo,angleR);
+	}
+	public override void Scale(float scale, PointF relativeTo)
+	{
+		this.Center = Common.ScalePoint(Center, relativeTo, scale);
+		this.Radius *= scale;
 	}
 	#endregion
 }

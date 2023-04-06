@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 namespace GraphicLibrary.Models;
 public interface IGraphicalElement
 {
-	public void MoveCoordinates(int dX, int dY);
-	public void Rotate(float angleR, Point relativeTo);
+	public void MoveCoordinates(float dX, float dY);
+	public void Rotate(float angleR, PointF relativeTo);
+	public void Scale(float scale, PointF relativeTo);
+
 	public IGraphicalElement Clone();
 }

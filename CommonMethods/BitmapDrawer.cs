@@ -50,19 +50,28 @@ public class BitmapDrawer
 		this.CurrentFrame = new Bitmap(FrameWidth, FrameHeight);
 	}
 
-	public void RenderFrame(bool noClear = false)
+	public void RenderFrame(bool addAxes=true, bool noClear = false)
 	{
 		if(!noClear) this.CurrentFrame = new Bitmap(FrameWidth, FrameHeight);
 		this.Dots.ForEach(x => DrawDot(x.Point, x.Color, x.PatternResolver));
 		this.Lines.ForEach(x => DrawLine(x.Start, x.End, x.Color, x.PatternResolver));
 		this.Circles.ForEach(x => DrawCircle(x.Center, x.Radius, x.Color, x.PatternResolver));
+		if(addAxes) {
+			var left = new PointF(0, FrameHeight / 2);
+			var right = new PointF(FrameWidth, FrameHeight / 2);
+			var up = new PointF(FrameWidth / 2, 0);
+			var down = new PointF(FrameWidth / 2, FrameWidth);
+
+			this.DrawLine(left, right, Color.Orange, ALinearElement.GetDefaultPatternResolver());
+			this.DrawLine(up, down, Color.Orange, ALinearElement.GetDefaultPatternResolver());
+		}
 	}
 
-	public void AddPoint(Point point, Color? color = null)
+	public void AddPoint(PointF point, Color? color = null)
 	{
 		Dots.Add(new(point, color ?? Color.LightGreen));
 	}
-	public void AddLine(Point start, Point end, Color? color = null, IEnumerator<bool>? patternResolver = null)
+	public void AddLine(PointF start, PointF end, Color? color = null, IEnumerator<bool>? patternResolver = null)
 	{
 		if(start.Equals(end)) {
 			AddPoint(start, color);
@@ -71,7 +80,7 @@ public class BitmapDrawer
 
 		Lines.Add(new(start, end, color ?? Color.LightGreen, patternResolver ?? ALinearElement.GetDefaultPatternResolver()));
 	}
-	public void AddCircle(Point center, Point onCircle, Color? color = null, IEnumerator<bool>? patternResolver = null)
+	public void AddCircle(PointF center, PointF onCircle, Color? color = null, IEnumerator<bool>? patternResolver = null)
 	{
 		if(center.Equals(onCircle)) {
 			AddPoint(center, color);
@@ -88,7 +97,7 @@ public class BitmapDrawer
 		for(int i = 0; i < Circles.Count; i++) yield return Circles[i];
 	}
 
-	public void MoveAll(int dX, int dY)
+	public void MoveAll(float dX, float dY)
 	{
 		var elements = GetElements();
 
@@ -96,7 +105,7 @@ public class BitmapDrawer
 			elements.Current.MoveCoordinates(dX, dY);
 		}
 	}
-	public void RotateAll(float angleR, Point relativeTo, bool byCopy = false)
+	public void RotateAll(float angleR, PointF relativeTo, bool byCopy = false)
 	{
 		var elements = GetElements();
 
@@ -120,6 +129,14 @@ public class BitmapDrawer
 			}
 		}
 	}
+	public void ScaleAll(float scale, PointF relativeTo)
+	{
+		var elements = GetElements();
+
+		while(elements.MoveNext()) {
+			elements.Current.Scale(scale,relativeTo);
+		}
+	}
 
 	#endregion
 
@@ -127,7 +144,7 @@ public class BitmapDrawer
 	#region private
 
 	#region common
-	private bool isValidPoint(Point target)
+	private bool isValidPoint(PointF target)
 	{
 		if(target.X < 0 || target.Y < 0) return false;
 		if(target.X > this.CurrentFrame.Width - 1) return false;
@@ -135,26 +152,26 @@ public class BitmapDrawer
 
 		return true;
 	}
-	private void BypassPoint(Point point, Color color, IEnumerator<bool> patternResolver)
+	private void BypassPoint(PointF point, Color color, IEnumerator<bool> patternResolver)
 	{
 		if(isValidPoint(point)) {
 			patternResolver.MoveNext();
 			if(patternResolver.Current)
-				this.CurrentFrame.SetPixel(point.X, point.Y, color);
+				this.CurrentFrame.SetPixel((int)Round(point.X), (int)Round(point.Y), color);
 		}
 	}
 	#endregion
 
 	#region point
-	private void DrawDot(Point point, Color color, IEnumerator<bool> patternResolver)
+	private void DrawDot(PointF point, Color color, IEnumerator<bool> patternResolver)
 	{
 		BypassPoint(point, color, patternResolver);
 	}
 	#endregion
 
 	#region line
-	private float GetLineStep(int start, int end, int steps) => (end - start) / (float)steps;
-	private void DrawLine(Point start, Point end, Color color, IEnumerator<bool> patternResolver)
+	private float GetLineStep(float start, float end, float steps) => (end - start) / steps;
+	private void DrawLine(PointF start, PointF end, Color color, IEnumerator<bool> patternResolver)
 	{
 		var dX = Abs(end.X - start.X);
 		var dY = Abs(end.Y - start.Y);
@@ -162,156 +179,33 @@ public class BitmapDrawer
 		if(dX > dY) { // we need to iterate  by X
 			if(start.X > end.X) Swap(ref start, ref end);
 
-			float stepY = GetLineStep(start.Y, end.Y, (int)dX);
-			for(int iX = start.X; iX <= end.X; iX++) {
+			float stepY = GetLineStep(start.Y, end.Y, dX);
+			for(float iX = start.X; iX <= end.X; iX++) {
 				float currY = start.Y + (iX - start.X) * stepY;
-				BypassPoint(new(iX, (int)currY), color, patternResolver);
+				BypassPoint(new(iX, currY), color, patternResolver);
 			}
 		} else { // else by Y
 			if(start.Y > end.Y) Swap(ref start, ref end);
 
-			float stepX = GetLineStep(start.X, end.X, (int)dY);
-			for(int iY = start.Y; iY <= end.Y; iY++) {
+			float stepX = GetLineStep(start.X, end.X, dY);
+			for(float iY = start.Y; iY <= end.Y; iY++) {
 				float currX = start.X + (iY - start.Y) * stepX;
-				BypassPoint(new((int)currX, iY), color, patternResolver);
+				BypassPoint(new(currX, iY), color, patternResolver);
 			}
 		}
 	}
 	#endregion
 
 	#region circle
-	/* x^2 + y^2 = r^2
-	 * y = sqrt(r^2-x^2)
-	 * x = sqrt(r^2-y^2)
-	 * Суть алгоритма: https://imgur.com/a/58tXokQ
-	 * Все данные циклы никак невозможно замерджить в 1, ибо это ломает паттерн окружности.
-	 * В случае окружности сполной линии алгоритм будет в 8 раз проще.
-	 * Рабочий порядок обхода: 1 -> 4 -> 3 -> 2 (по кругу).
-	 */
-	private IEnumerator<Point> GetOneFourthPoints(Point center, float radius, int part)
+	private void DrawCircle(PointF center, float radius, Color color, IEnumerator<bool> patternResolver)
 	{
-		float
-			iterateX = 0, iterateY = 0,
-			relativeX = 0, relativeY = 0,
-			absoluteX = 0, absoluteY = 0;
+		var len = 2 * PI * radius;
+		var angleStep = 2 * PI / len;
 
-		int
-			kX = 0, kY = 0;
-
-		if(part == 1) {
-			kX = 1; kY = -1;
-
-			for(iterateX = 0; iterateX <= radius / 2; iterateX++) {
-				relativeX = iterateX;
-				relativeY = Sqrt(Abs(radius * radius - relativeX * relativeX));
-
-				absoluteX = center.X + kX * relativeX;
-				absoluteY = center.Y + kY * relativeY;
-
-				yield return new((int)absoluteX, (int)absoluteY);
-			}
-			for(iterateY = relativeY; iterateY >= 0; iterateY--) {
-				relativeY = iterateY;
-				relativeX = Sqrt(Abs(radius * radius - relativeY * relativeY));
-
-				absoluteY = center.Y + kY * iterateY;
-				absoluteX = center.X + kX * relativeX;
-
-				yield return new((int)absoluteX, (int)absoluteY);
-			}
-
-			yield break;
-		}
-		if(part == 4) {
-			kX = 1; kY = 1;
-
-			for(iterateY = 0; iterateY <= radius / 2; iterateY++) {
-				relativeY = iterateY;
-				relativeX = Sqrt(Abs(radius * radius - relativeY * relativeY));
-
-				absoluteY = center.Y + kY * iterateY;
-				absoluteX = center.X + kX * relativeX;
-
-				yield return new((int)absoluteX, (int)absoluteY);
-			}
-			for(iterateX = relativeX; iterateX >= 0; iterateX--) {
-				relativeX = iterateX;
-				relativeY = Sqrt(Abs(radius * radius - relativeX * relativeX));
-
-				absoluteX = center.X + kX * relativeX;
-				absoluteY = center.Y + kY * relativeY;
-
-				yield return new((int)absoluteX, (int)absoluteY);
-			}
-
-			yield break;
-		}
-		if(part == 3) {
-			kX = -1; kY = 1;
-
-			for(iterateX = 0; iterateX <= radius / 2; iterateX++) {
-				relativeX = iterateX;
-				relativeY = Sqrt(Abs(radius * radius - relativeX * relativeX));
-
-				absoluteX = center.X + kX * relativeX;
-				absoluteY = center.Y + kY * relativeY;
-
-				yield return new((int)absoluteX, (int)absoluteY);
-			}
-			for(iterateY = relativeY; iterateY >= 0; iterateY--) {
-				relativeY = iterateY;
-				relativeX = Sqrt(Abs(radius * radius - relativeY * relativeY));
-
-				absoluteY = center.Y + kY * iterateY;
-				absoluteX = center.X + kX * relativeX;
-
-				yield return new((int)absoluteX, (int)absoluteY);
-			}
-
-			yield break;
-		}
-		if(part == 2) {
-			kX = -1; kY = -1;
-
-			for(iterateY = 0; iterateY <= radius / 2; iterateY++) {
-				relativeY = iterateY;
-				relativeX = Sqrt(Abs(radius * radius - relativeY * relativeY));
-
-				absoluteY = center.Y + kY * iterateY;
-				absoluteX = center.X + kX * relativeX;
-
-				yield return new((int)absoluteX, (int)absoluteY);
-			}
-			for(iterateX = relativeX; iterateX >= 0; iterateX--) {
-				relativeX = iterateX;
-				relativeY = Sqrt(Abs(radius * radius - relativeX * relativeX));
-
-				absoluteX = center.X + kX * relativeX;
-				absoluteY = center.Y + kY * relativeY;
-
-				yield return new((int)absoluteX, (int)absoluteY);
-			}
-
-			yield break;
-		}
-
-		throw new ArgumentOutOfRangeException($"Valid range: 1 <= {nameof(part)} <= 4.");
-	}
-	private static readonly int[] order = { 1, 4, 3, 2 };
-	private IEnumerator<Point> GetCirclePoints(Point center, float radius)
-	{
-		for(int i = 0; i < order.Length; i++) {
-			var points = GetOneFourthPoints(center, radius, order[i]);
-			while(points.MoveNext()) {
-				yield return points.Current;
-			}
-		}
-	}
-	private void DrawCircle(Point center, float radius, Color color, IEnumerator<bool> patternResolver)
-	{
-		var points = GetCirclePoints(center, radius);
-		while(points.MoveNext()) {
-			BypassPoint(points.Current, color, patternResolver);
+		for(float a = 0; a < (2 * PI); a += angleStep) {
+			var point = Common.FindPointOnCircle(center, radius, a);
+			var rounded = new Point((int)Round(point.X), (int)Round(point.Y));
+			BypassPoint(rounded, color, patternResolver);
 		}
 	}
 	#endregion

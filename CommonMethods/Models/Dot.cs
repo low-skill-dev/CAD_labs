@@ -8,15 +8,10 @@ using System.Threading.Tasks;
 namespace GraphicLibrary.Models;
 public class Dot : ALinearElement
 {
-	public Point Point { get; private set; }
+	public PointF Point { get; private set; }
 
-	public static IEnumerator<bool> GetPatternResolver()
-	{
-		while(true) yield return true;
-	}
-
-	public Dot(System.Drawing.Point point, Color color)
-		: base(color, GetPatternResolver())
+	public Dot(System.Drawing.PointF point, Color color)
+		: base(color, GetDefaultPatternResolver())
 	{
 		this.Point = point;
 	}
@@ -29,13 +24,17 @@ public class Dot : ALinearElement
 	{
 		return new Dot(this.Point, this.Color);
 	}
-	public override void MoveCoordinates(int dX, int dY)
+	public override void MoveCoordinates(float dX, float dY)
 	{
-		this.Point += new Size(dX, dY);
+		this.Point += new SizeF(dX, dY);
 	}
-	public override void Rotate(float angleR, Point relativeTo)
+	public override void Rotate(float angleR, PointF relativeTo)
 	{
 		this.Point = Common.RotatePoint(this.Point, relativeTo, angleR);
+	}
+	public override void Scale(float scale, PointF relativeTo)
+	{
+		this.Point = Common.ScalePoint(Point, relativeTo, scale);
 	}
 	#endregion
 }
