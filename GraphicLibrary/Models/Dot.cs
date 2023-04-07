@@ -24,7 +24,7 @@ public class Dot : ALinearElement
 	{
 		return new Dot(this.Point, this.Color);
 	}
-	public override void MoveCoordinates(float dX, float dY)
+	public override void Move(float dX, float dY)
 	{
 		this.Point += new SizeF(dX, dY);
 	}
@@ -35,6 +35,14 @@ public class Dot : ALinearElement
 	public override void Scale(float scale, PointF relativeTo)
 	{
 		this.Point = Common.ScalePoint(Point, relativeTo, scale);
+	}
+	public override void Mirror(PointF relativeTo)
+	{
+		this.Point = Common.MirrorPoint(Point, relativeTo);
+	}
+	public override void Mirror(LineF relativeTo)
+	{
+		this.Point = Common.MirrorPoint(Point, relativeTo);
 	}
 	#endregion
 }

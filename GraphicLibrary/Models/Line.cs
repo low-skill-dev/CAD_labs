@@ -50,7 +50,7 @@ public class Line : ALinearElement
 	{
 		return new Line(this.Start, this.End, this.Color, this.PatternResolver);
 	}
-	public override void MoveCoordinates(float dX, float dY)
+	public override void Move(float dX, float dY)
 	{
 		this.Start += new SizeF(dX, dY);
 		this.End += new SizeF(dX, dY);
@@ -64,6 +64,16 @@ public class Line : ALinearElement
 	{
 		this.Start = Common.ScalePoint(Start, relativeTo, scale);
 		this.End = Common.ScalePoint(End, relativeTo, scale);
+	}
+	public override void Mirror(PointF relativeTo)
+	{
+		this.Start = Common.MirrorPoint(Start, relativeTo);
+		this.End = Common.MirrorPoint(End, relativeTo);
+	}
+	public override void Mirror(LineF relativeTo)
+	{
+		this.Start = Common.MirrorPoint(Start, relativeTo);
+		this.End = Common.MirrorPoint(End, relativeTo);
 	}
 	#endregion
 }

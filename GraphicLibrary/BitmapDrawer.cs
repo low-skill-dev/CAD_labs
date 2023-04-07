@@ -34,6 +34,8 @@ public class BitmapDrawer
 	private List<Line> Lines { get; set; } = new();
 	private List<Circle> Circles { get; set; } = new();
 
+	public List<IGraphicalElement> ConstantObjects { get; private set; } = new();
+
 	public BitmapDrawer(int FrameWidth, int FrameHeight)
 	{
 		this.FrameWidth = FrameWidth;
@@ -64,6 +66,13 @@ public class BitmapDrawer
 
 			this.DrawLine(left, right, Color.Orange, ALinearElement.GetDefaultPatternResolver());
 			this.DrawLine(up, down, Color.Orange, ALinearElement.GetDefaultPatternResolver());
+		}
+		foreach(var obj in ConstantObjects) {
+			if(obj is null) continue;
+
+			if(obj is Dot) this.DrawDot((Dot)obj);
+			if(obj is Line) this.DrawLine((Line)obj);
+			if(obj is Circle) this.DrawCircle((Circle)obj);
 		}
 	}
 
@@ -102,7 +111,7 @@ public class BitmapDrawer
 		var elements = GetElements();
 
 		while(elements.MoveNext()) {
-			elements.Current.MoveCoordinates(dX, dY);
+			elements.Current.Move(dX, dY);
 		}
 	}
 	public void RotateAll(float angleR, PointF relativeTo, bool byCopy = false)
@@ -137,6 +146,22 @@ public class BitmapDrawer
 			elements.Current.Scale(scale,relativeTo);
 		}
 	}
+	public void MirrorAll(PointF relativeTo)
+	{
+		var elements = GetElements();
+
+		while(elements.MoveNext()) {
+			elements.Current.Mirror(relativeTo);
+		}
+	}
+	public void MirrorAll(LineF relativeTo)
+	{
+		var elements = GetElements();
+
+		while(elements.MoveNext()) {
+			elements.Current.Mirror(relativeTo);
+		}
+	}
 
 	#endregion
 
@@ -163,6 +188,7 @@ public class BitmapDrawer
 	#endregion
 
 	#region point
+	private void DrawDot(Dot dot) => DrawDot(dot.Point,dot.Color,dot.PatternResolver);
 	private void DrawDot(PointF point, Color color, IEnumerator<bool> patternResolver)
 	{
 		BypassPoint(point, color, patternResolver);
@@ -171,6 +197,7 @@ public class BitmapDrawer
 
 	#region line
 	private float GetLineStep(float start, float end, float steps) => (end - start) / steps;
+	private void DrawLine(Line line) => DrawLine(line.Start, line.End, line.Color, line.PatternResolver);
 	private void DrawLine(PointF start, PointF end, Color color, IEnumerator<bool> patternResolver)
 	{
 		var dX = Abs(end.X - start.X);
@@ -197,6 +224,7 @@ public class BitmapDrawer
 	#endregion
 
 	#region circle
+	private void DrawCircle(Circle circle) => DrawCircle(circle.Center, circle.Radius, circle.Color, circle.PatternResolver);
 	private void DrawCircle(PointF center, float radius, Color color, IEnumerator<bool> patternResolver)
 	{
 		var len = 2 * PI * radius;

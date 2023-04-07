@@ -13,9 +13,11 @@ public abstract class ALinearElement : IGraphicalElement
 	public IEnumerator<bool> PatternResolver { get; init; }
 
 	#region IGraphicalElement
-	public abstract void MoveCoordinates(float dX, float dY);
+	public abstract void Move(float dX, float dY);
 	public abstract void Rotate(float angleR, PointF relativeTo);
 	public abstract void Scale(float scale, PointF relativeTo);
+	public abstract void Mirror(PointF relativeTo);
+	public abstract void Mirror(LineF relativeTo);
 
 	public abstract IGraphicalElement Clone();
 	#endregion

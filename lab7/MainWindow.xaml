@@ -3,10 +3,29 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:lab7"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-
-    </Grid>
+        Title="Лабораторная 7. Рыжов МВС-120" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
+	<Grid>
+		<StackPanel Orientation="Vertical" Width="1700">
+			<StackPanel Orientation="Horizontal">
+				<StackPanel Orientation="Vertical" Width="350">
+					<Label HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Рисование</Label>
+					<TextBox Name="DebugOut" Width="350" HorizontalAlignment="Center" FontSize="16" IsReadOnly="True">Status will be here...</TextBox>
+					<Button Width="350" Name="LoopButton" Click="LoopButton_Click" FontSize="16">Замкнуть</Button>
+					<Button Width="350" Name="ClearButton" Click="ClearButton_Click" FontSize="16">Очистить</Button>
+				</StackPanel>
+				<StackPanel Orientation="Horizontal">
+					<StackPanel Orientation="Vertical" Width="350">
+						<Label HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Периметр</Label>
+						<TextBox Name="PerimeterOut" Width="350" HorizontalAlignment="Center" FontSize="16" IsReadOnly="True"></TextBox>
+					</StackPanel>
+					<StackPanel Orientation="Vertical" Width="350">
+						<Label HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Площадь</Label>
+						<TextBox Name="AreaOut" Width="350" HorizontalAlignment="Center" FontSize="16" IsReadOnly="True"></TextBox>
+					</StackPanel>
+				</StackPanel>
+			</StackPanel>
+			<Image Name="ShowedImage" Width="1700" Height="700" Margin="0,10,0,0" MouseDown="ShowedImage_Click"></Image>
+		</StackPanel>
+	</Grid>
 </Window>

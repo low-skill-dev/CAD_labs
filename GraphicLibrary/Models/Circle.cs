@@ -51,7 +51,7 @@ public sealed class Circle : ALinearElement
 	{
 		return new Circle(this.Center,this.Radius,this.Color,this.PatternResolver);
 	}
-	public override void MoveCoordinates(float dX, float dY)
+	public override void Move(float dX, float dY)
 	{
 		this.Center += new SizeF(dX, dY);
 	}
@@ -63,6 +63,14 @@ public sealed class Circle : ALinearElement
 	{
 		this.Center = Common.ScalePoint(Center, relativeTo, scale);
 		this.Radius *= scale;
+	}
+	public override void Mirror(PointF relativeTo)
+	{
+		this.Center = Common.MirrorPoint(Center, relativeTo);
+	}
+	public override void Mirror(LineF relativeTo)
+	{
+		this.Center = Common.MirrorPoint(Center, relativeTo);
 	}
 	#endregion
 }

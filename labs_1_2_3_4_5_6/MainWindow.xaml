@@ -4,13 +4,28 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="MainWindow" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
+        Title="Лабораторные 1,2,3,4,5,6. Рыжов МВС-120" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
 	<Grid>
-		<StackPanel Orientation="Vertical">
+		<StackPanel Orientation="Vertical" Width="1700">
 			<StackPanel Orientation="Horizontal">
-				<StackPanel Orientation="Vertical" Width="350" Margin="5">
+				<StackPanel Orientation="Vertical" Width="350">
 					<Label HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Рисование</Label>
+					<GroupBox>
+						<StackPanel Orientation="Vertical">
+							<StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+								<RadioButton Name="isSimpleLine" IsChecked="True" Margin="0,0,40,0" GroupName="1" FontSize="14">Линия простая</RadioButton>
+								<RadioButton Name="isSimpleCircle" GroupName="1" FontSize="14">Окружность простая</RadioButton>
+							</StackPanel>
+							<StackPanel Orientation="Horizontal">
+								<RadioButton Name="isBresLine" Margin="0,0,15,0" GroupName="1" FontSize="14">Линия Брезенхема</RadioButton>
+								<RadioButton Name="isBresCircle" GroupName="1" FontSize="14">Окружность Брезенхема</RadioButton>
+							</StackPanel>
+						</StackPanel>
+					</GroupBox>
 					<TextBox Name="DebugOut" Width="350" HorizontalAlignment="Center" FontSize="16" IsReadOnly="True">Status will be here...</TextBox>
+					<Label HorizontalAlignment="Center" FontSize="16">Pattern Resolver</Label>
+					<TextBox Name="PatterResolver" Width="350" HorizontalAlignment="Center" FontSize="16">+</TextBox>
+					<Label HorizontalAlignment="Left" FontSize="16">'+' = solid line; '+---' = 1 color, 3 skip;</Label>
 					<Button Width="350" Name="LoopButton" Click="LoopButton_Click" FontSize="16">Замкнуть</Button>
 					<Button Width="350" Name="ClearButton" Click="ClearButton_Click" FontSize="16">Очистить</Button>
 				</StackPanel>
@@ -62,8 +77,39 @@
 					</StackPanel>
 					<Button Name="ScaleButton" Click="ScaleButton_Click" FontSize="16">Задать</Button>
 				</StackPanel>
+				<StackPanel Orientation="Vertical" Width="250" Margin="5">
+					<Label HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Отражение</Label>
+					<Label FontSize="16">Относительно точки</Label>
+					<StackPanel Orientation="Horizontal">
+						<Button Name="SelectMirrorPointButton" Click="SelectMirrorPointButton_Click">Выбрать нажатием</Button>
+						<Label FontSize="16">X</Label>
+						<TextBox Name="MirrorX" Width="49"  FontSize="16"></TextBox>
+						<Label FontSize="16">Y</Label>
+						<TextBox Name="MirrorY" Width="49"  FontSize="16"></TextBox>
+					</StackPanel>
+					<Button Name="MirrorByPoint" Click="MirrorByPoint_Click" FontSize="16">Отразить</Button>
+				</StackPanel>
+				<StackPanel Orientation="Vertical" Width="250" Margin="5">
+					<Label HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Отражение</Label>
+					<Label FontSize="14">Отн. прямой заданной по 2 точкам</Label>
+					<StackPanel Orientation="Horizontal">
+						<Button Name="SelectMirrorLine1Button" Click="SelectMirrorLine1Button_Click">Выбрать нажатием</Button>
+						<Label FontSize="16">X1</Label>
+						<TextBox Name="MirrorX1" Width="43"  FontSize="16"></TextBox>
+						<Label FontSize="16">Y1</Label>
+						<TextBox Name="MirrorY1" Width="43"  FontSize="16"></TextBox>
+					</StackPanel>
+					<StackPanel Orientation="Horizontal">
+						<Button Name="SelectMirrorLine2Button" Click="SelectMirrorLine2Button_Click">Выбрать нажатием</Button>
+						<Label FontSize="16">X2</Label>
+						<TextBox Name="MirrorX2" Width="43"  FontSize="16"></TextBox>
+						<Label FontSize="16">Y2</Label>
+						<TextBox Name="MirrorY2" Width="43"  FontSize="16"></TextBox>
+					</StackPanel>
+					<Button Name="MirrorByLine" Click="MirrorByLine_Click" FontSize="16">Отразить</Button>
+				</StackPanel>
 			</StackPanel>
-			<Image Name="ShowedImage" Width="1200" Height="500" Margin="0,10,0,0" MouseDown="ShowedImage_Click"></Image>
+			<Image Name="ShowedImage" Width="1700" Height="700" Margin="0,10,0,0" MouseDown="ShowedImage_Click"></Image>
 		</StackPanel>
 	</Grid>
 </Window>
