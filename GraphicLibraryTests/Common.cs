@@ -1,15 +1,31 @@
 ﻿using System.Drawing;
+using System.Linq;
 using System.Windows.Media;
 using GraphicLibrary;
 using GraphicLibrary.Models;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Xunit;
-
+using Xunit.Abstractions;
 using static System.MathF;
+using Color = System.Drawing.Color;
 
 namespace GraphicLibraryTests;
 
 public class CommonTests
 {
+	private static IEnumerable<T> IncapsulateEnumerator<T>(IEnumerator<T> enumer)
+	{
+		while(enumer.MoveNext()) yield return enumer.Current;
+	}
+
+
+	private ITestOutputHelper _output;
+	public CommonTests(ITestOutputHelper output)
+	{
+		_output = output;
+	}
+
+
 	#region Rotate
 	private static Point rel = new Point(0, 0);
 
@@ -370,5 +386,38 @@ public class CommonTests
 
 
 	// TODO: Написать кейс для ситуаций вне центра (это фейлится в реале)
+	#endregion
+
+	#region Besie Points
+	[Fact]
+	public void CanCreate()
+	{
+
+		var original = new PointF[] {
+			new(1,1), new(5,5), new(7,7), new(20,20) // y=x line
+		};
+
+		var polim = new GraphicLibrary.Models.LagrangePolynomial(original,0,Color.Black);
+
+		var Xs = Enumerable.Range(0, 100);
+		var recreated = Xs.Select(x => new PointF(x, polim.CalcY(x)));
+
+		Assert.All(recreated,x=> Round(x.X,3).Equals(Round(x.Y,3)));
+	}
+
+	[Fact]
+	public void CanCalc()
+	{
+		var original = new PointF[] {
+			new(10,10), new(15,12), new(20,20) // sqre part
+		};
+
+		var polim = new GraphicLibrary.Models.LagrangePolynomial(original, 0, Color.Black);
+
+		for(float i = 5; i < 25; i++) {
+			var val = polim.CalcY(i);
+				_output.WriteLine(val.ToString("0"));
+		}
+	}
 	#endregion
 }

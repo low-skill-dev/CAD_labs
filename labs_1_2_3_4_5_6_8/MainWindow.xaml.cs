@@ -1,5 +1,4 @@
 ﻿using GraphicLibrary;
-using GraphicLibrary.Models;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -34,7 +33,8 @@ public partial class MainWindow : Window
 		None,
 		WaitingMirrorPoint,
 		WaitingMirrorLine1,
-		WaitingMirrorLine2
+		WaitingMirrorLine2,
+		WaitingFillingPoint
 	}
 
 	private States _currentState;
@@ -46,7 +46,7 @@ public partial class MainWindow : Window
 
 	private System.Windows.Point _center => new(ShowedImage.Width / 2, ShowedImage.Height / 2);
 
-	private GraphicLibrary.Models.LineF? _mirrorAxeLine;
+	private LineF? _mirrorAxeLine;
 
 	public MainWindow()
 	{
@@ -132,6 +132,13 @@ public partial class MainWindow : Window
 				_drawer.RenderFrame();
 				ShowedImage.Source = _drawer.CurrentFrameImage;
 
+				_currentOverrideState = OverrideStates.None;
+			}
+			else if(_currentOverrideState == OverrideStates.WaitingFillingPoint) {
+				_drawer.AddFiller(new(new((float)pos.X, (float)pos.Y), SelectedFillColor!.Value));
+
+				_drawer.RenderFrame();
+				ShowedImage.Source = _drawer.CurrentFrameImage;
 				_currentOverrideState = OverrideStates.None;
 			}
 		} else {
@@ -328,6 +335,29 @@ public partial class MainWindow : Window
 	private void SelectMirrorLine1Button_Click(object sender, RoutedEventArgs e)
 	{
 		_currentOverrideState = OverrideStates.WaitingMirrorLine1;
+	}
+
+	private System.Drawing.Color? SelectedFillColor;
+	private void SelectColorButton_Click(object sender, RoutedEventArgs e)
+	{
+		System.Windows.Forms.ColorDialog colorDialog = new System.Windows.Forms.ColorDialog();
+		if(colorDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+			SelectColorButton.Background = new SolidColorBrush(System.Windows.Media.Color
+				.FromArgb(colorDialog.Color.A, colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B));
+			this.SelectedFillColor = System.Drawing.Color
+				.FromArgb(colorDialog.Color.A, colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B);
+		}
+	}
+
+	private void FillButton_Click(object sender, RoutedEventArgs e)
+	{
+		if(SelectedFillColor is null) return;
+		_currentOverrideState = OverrideStates.WaitingFillingPoint;
+	}
+
+	private void Interpolate_Click(object sender, RoutedEventArgs e)
+	{
+
 	}
 }
 

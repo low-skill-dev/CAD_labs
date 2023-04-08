@@ -1,8 +1,12 @@
-﻿using GraphicLibrary.Models;
+﻿using FastBitmapLib;
+using GraphicLibrary.Models;
 using System.Diagnostics.Metrics;
 using System.Drawing;
+using System.Net;
+using System.Windows;
 using System.Windows.Media.Imaging;
 using static System.MathF;
+using Point = System.Drawing.Point;
 
 namespace GraphicLibrary;
 public class BitmapDrawer
@@ -13,6 +17,8 @@ public class BitmapDrawer
 		v1 = v2;
 		v2 = temp;
 	}
+	private static Point RoundPoint(PointF point) =>
+		new Point((int)Round(point.X), (int)Round(point.Y));
 
 	public event EventHandler? FrameUpdated;
 
@@ -30,9 +36,11 @@ public class BitmapDrawer
 	*/
 
 
-	private List<Dot> Dots { get; set; } = new();
-	private List<Line> Lines { get; set; } = new();
-	private List<Circle> Circles { get; set; } = new();
+	public List<Dot> Dots { get; private set; } = new();
+	public List<Line> Lines { get; private set; } = new();
+	public List<Circle> Circles { get; private set; } = new();
+	public List<AreaFiller> AreaFillers { get; set; } = new();
+	public List<LagrangePolynomial> LagrangePolynomials { get; private set; } = new();
 
 	public List<IGraphicalElement> ConstantObjects { get; private set; } = new();
 
@@ -49,15 +57,19 @@ public class BitmapDrawer
 		this.Dots.Clear();
 		this.Lines.Clear();
 		this.Circles.Clear();
+		this.AreaFillers.Clear();
 		this.CurrentFrame = new Bitmap(FrameWidth, FrameHeight);
 	}
 
-	public void RenderFrame(bool addAxes=true, bool noClear = false)
+	public void RenderFrame(bool addAxes = true, bool noClear = false)
 	{
 		if(!noClear) this.CurrentFrame = new Bitmap(FrameWidth, FrameHeight);
+
 		this.Dots.ForEach(x => DrawDot(x.Point, x.Color, x.PatternResolver));
 		this.Lines.ForEach(x => DrawLine(x.Start, x.End, x.Color, x.PatternResolver));
 		this.Circles.ForEach(x => DrawCircle(x.Center, x.Radius, x.Color, x.PatternResolver));
+		this.AreaFillers.ForEach(x => FillAreaFrom(x));
+		this.LagrangePolynomials.ForEach(x => DrawLagrangePoly(x));
 		if(addAxes) {
 			var left = new PointF(0, FrameHeight / 2);
 			var right = new PointF(FrameWidth, FrameHeight / 2);
@@ -97,6 +109,14 @@ public class BitmapDrawer
 		}
 
 		Circles.Add(new(center, onCircle, color ?? Color.LightGreen, patternResolver ?? ALinearElement.GetDefaultPatternResolver()));
+	}
+	public void AddFiller(AreaFiller filler)
+	{
+		AreaFillers.Add(filler);
+	}
+	public void AddLagrangePolynomial(LagrangePolynomial polynomial)
+	{
+		this.LagrangePolynomials.Add(polynomial);
 	}
 
 	public IEnumerator<IGraphicalElement> GetElements()
@@ -143,7 +163,7 @@ public class BitmapDrawer
 		var elements = GetElements();
 
 		while(elements.MoveNext()) {
-			elements.Current.Scale(scale,relativeTo);
+			elements.Current.Scale(scale, relativeTo);
 		}
 	}
 	public void MirrorAll(PointF relativeTo)
@@ -171,6 +191,8 @@ public class BitmapDrawer
 	#region common
 	private bool isValidPoint(PointF target)
 	{
+		if(!(float.IsFinite(target.X) && float.IsFinite(target.Y))) return false;
+
 		if(target.X < 0 || target.Y < 0) return false;
 		if(target.X > this.CurrentFrame.Width - 1) return false;
 		if(target.Y > this.CurrentFrame.Height - 1) return false;
@@ -188,7 +210,7 @@ public class BitmapDrawer
 	#endregion
 
 	#region point
-	private void DrawDot(Dot dot) => DrawDot(dot.Point,dot.Color,dot.PatternResolver);
+	private void DrawDot(Dot dot) => DrawDot(dot.Point, dot.Color, dot.PatternResolver);
 	private void DrawDot(PointF point, Color color, IEnumerator<bool> patternResolver)
 	{
 		BypassPoint(point, color, patternResolver);
@@ -238,7 +260,58 @@ public class BitmapDrawer
 	}
 	#endregion
 
+	#region fillArea
+	Stack<(int x, int y)> _toFill;
+	private void FillAround(Point start, Color newColor, Color baseColor)
+	{
+		Stack<Point> points = new();
+		points.Push(start);
 
+		while(points.TryPop(out var point)) {
+			CurrentFrame.SetPixel(point.X, point.Y, newColor);
+			for(int dx = -1; dx<2; dx += 2) {
+				Point target = new(point.X + dx, point.Y);
+				if(isValidPoint(target)) {
+					if(CurrentFrame.GetPixel(target.X, target.Y).Equals(baseColor)) {
+						points.Push(target);
+					}
+				}
+			}
+			for(int dy = -1; dy < 2; dy += 2) {
+				Point target = new(point.X, point.Y+dy);
+				if(isValidPoint(target)) {
+					if(CurrentFrame.GetPixel(target.X, target.Y).Equals(baseColor)) {
+						points.Push(target);
+					}
+				}
+			}
+		}
+	}
+	private void FillAreaFrom(AreaFiller filler, Color? baseColor = null)
+	{
+		FillAround(RoundPoint(filler.StartFilling), filler.Color, baseColor ?? Color.FromArgb(0,0,0,0));
+	}
+	#endregion
+
+	#region Lagrange
+	private void DrawLagrangePoly(LagrangePolynomial poly) 
+	{
+		float x = 0;
+		float y = poly.CalcY(x);
+		PointF curr, prev = new(x, y);
+
+		float step = poly.LineStep;
+		for(x = 1; x < this.FrameWidth; x += step) {
+			y = poly.CalcY(x);
+			curr = new(x, y);
+
+			if(isValidPoint(prev) && isValidPoint(curr))
+				DrawLine(prev, curr, System.Drawing.Color.Aqua, poly.PatternResolver);
+
+			prev = curr;
+		}
+	}
+	#endregion
 
 	#endregion
 }

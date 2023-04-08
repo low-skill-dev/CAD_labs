@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GraphicLibrary.Models;
 
-public abstract class ALinearElement : IGraphicalElement
+public abstract class ALinearElement : IGraphicalElement, IColoredElement
 {
 	public Color Color { get; init; }
 	public IEnumerator<bool> PatternResolver { get; init; }

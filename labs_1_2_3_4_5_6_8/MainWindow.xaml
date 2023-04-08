@@ -3,8 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="Лабораторные 1,2,3,4,5,6. Рыжов МВС-120" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
+        Title="Labs" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
 	<Grid>
 		<StackPanel Orientation="Vertical" Width="1700">
 			<StackPanel Orientation="Horizontal">
@@ -48,8 +49,15 @@
 							<Button Name="RotateButton" Click="RotateButton_Click" Margin="0,0,5,0" FontSize="16">Повернуть</Button>
 							<Button  Name="DuplicateRotated" Click="DuplicateRotated_Click" FontSize="16">Дублировать c поворотом</Button>
 						</DockPanel>
+
+						<Label HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Заливка</Label>
+						<Button Name="SelectColorButton" Click="SelectColorButton_Click">Выбрать цвет</Button>
+						<Button Name="FillButton" Click="FillButton_Click">Залить нажатием</Button>
 					</StackPanel>
 				</StackPanel>
+
+
+
 				<StackPanel Orientation="Vertical" Width="250" Margin="5">
 					<Label HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Смещение</Label>
 					<StackPanel Orientation="Horizontal">

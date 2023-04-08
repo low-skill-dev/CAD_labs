@@ -23,9 +23,19 @@
 						<Label HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Площадь</Label>
 						<TextBox Name="AreaOut" Width="350" HorizontalAlignment="Center" FontSize="16" IsReadOnly="True"></TextBox>
 					</StackPanel>
+					<StackPanel Orientation="Vertical" Width="350">
+						<Label HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Интерполяция</Label>
+						<Button Name="Interpolate" Click="Interpolate_Click"  FontSize="16">Интерполировать</Button>
+						<Label HorizontalAlignment="Center" FontSize="16">Шаг</Label>
+						<Slider Minimum="1" Maximum="200" Value="1" Name="StepSelector"/>
+						<Label HorizontalAlignment="Center" FontSize="16">Pattern Resolver</Label>
+						<TextBox Name="PatterResolver" Width="350" HorizontalAlignment="Center" FontSize="16">+</TextBox>
+					</StackPanel>
 				</StackPanel>
+				
 			</StackPanel>
-			<Image Name="ShowedImage" Width="1700" Height="700" Margin="0,10,0,0" MouseDown="ShowedImage_Click"></Image>
-		</StackPanel>
+			<Image Name="ShowedImage" Width="1700" Height="700" Margin="0,10,0,0" MouseDown="ShowedImage_Click">
+							</Image>
+					</StackPanel>
 	</Grid>
 </Window>

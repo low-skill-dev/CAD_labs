@@ -5,9 +5,9 @@ using System.Windows.Media.Imaging;
 using System.Drawing;
 using System.Linq;
 using System.IO;
-using GraphicLibrary.Models;
 using static System.MathF;
 using System.Security.Cryptography.X509Certificates;
+using GraphicLibrary.MathModels;
 
 namespace GraphicLibrary;
 
@@ -174,7 +174,7 @@ public class Common
 
 		var (k, b) = FindLinearEquation(relativeTo);
 
-		var (kNormal, bNormal) = FindLinearEquation(-1/k, target);
+		var (kNormal, bNormal) = FindLinearEquation(-1 / k, target);
 
 		var xMirror = -(b - bNormal) / (k - kNormal);
 		var yMirror = kNormal * xMirror + bNormal; // y = kx + b
@@ -191,11 +191,9 @@ public class Common
 	{
 		return lines.Sum(line => GetCirleRadius(line.Start, line.End));
 	}
-
-
 	private static IEnumerable<PointF> LinesToPoints(IEnumerable<LineF> lines)
 	{
-		foreach (var line in lines) {
+		foreach(var line in lines) {
 			yield return line.Start;
 			yield return line.End;
 		}
@@ -205,9 +203,9 @@ public class Common
 	 */
 	public static float FindArea(IEnumerable<LineF> lines)
 	{
-		var points = LinesToPoints(lines).Distinct().ToArray();
+		var points = lines.Select(x => x.End).ToArray();
 
-		float sum=0;
+		float sum = 0;
 		for(int i = 1; i < points.Length; i++) {
 			var pC = points[i];
 			var pP = points[i - 1];
@@ -219,7 +217,73 @@ public class Common
 		var pL = points[points.Length - 1];
 		sum += (pL.X + pF.X) * (pL.Y - pF.Y); // включая первую
 
-		return Abs(sum)/2;
+		return Abs(sum) / 2;
 	}
-	
+
+
+
+	// ru.wikipedia.org/wiki/Интерполяционный_многочлен_Лагранжа
+	//private static float LagrangeFind(IList<PointF> points)
+	//{
+	//	var multiplicatinos = new List<List<LineEquation>>(points.Count);
+
+	//	for(int j = 0; j < points.Count; j++) {
+	//		for(int i = 0; i < points.Count; i++) {
+	//			if(i == j) continue;
+	//			if(multiplicatinos[j] is null) multiplicatinos[j] = new(points.Count - 1);
+
+	//			/* li(x) = (x-xj)/(xi-xj) = x/(xi-xj) - xj/(xi-xj)
+	//			 * k = 1/(xi-xj), b = -xj/(xi-xj)
+	//			 */
+	//			float xi = points[i].X, xj = points[j].X;
+	//			multiplicatinos[j].Add(new LineEquation {
+	//				K = 1 / (xi - xj),
+	//				B = -xj / (xi - xj)
+	//			}); // получим базисный полином l i-тый от х
+	//		}
+	//	}
+	//}
+	/* Для задачи генерации кривой безье через заданные точки существует т.н. интерполяционный многочлен Лагранжа
+	 * Многочлен Лагранжа представляет собой функцию, что если (x1...xk; y1...yk) - базовые точки, т.е. точки,
+	 * через которые должна проходить кривая безье, то L(xk) = yk, при этом в остальных точках значение соответствует
+	 * искомой кривой.
+	 */
+	public static IEnumerator<PointF> WithControlPoints(IEnumerable<PointF> originalPoints)
+	{
+		//var enumer = originalPoints.GetEnumerator();
+
+		//if(!enumer.MoveNext()) yield break;
+		//PointF prev = enumer.Current;
+		//yield return prev;
+
+		//if(!enumer.MoveNext()) yield break;
+		//PointF start = enumer.Current;
+		//yield return prev;
+
+		//PointF end;
+		//float dX, dY;
+		//while(enumer.MoveNext()) {
+		//	end = enumer.Current;
+
+		//	/*                                #
+		//	 *         #
+		//	 *  #
+		//	 */
+		//	// предыдущая точка нижу начальной
+		//	if(prev.Y < start.Y) {
+		//		dY = (start.Y) + (start.Y - end.Y)
+		//	}
+
+
+		//	dX = (curr.X - prev.X) / 2;
+		//	dY = (curr.Y - prev.Y) / 2;
+
+		//	yield return new PointF(dX, dY);
+		//	yield return curr;
+		//	prev = curr;
+		//}
+
+		throw new NotImplementedException();
+	}
+
 }

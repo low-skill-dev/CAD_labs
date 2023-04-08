@@ -1,4 +1,5 @@
 ﻿using GraphicLibrary;
+using GraphicLibrary.MathModels;
 using GraphicLibrary.Models;
 using System;
 using System.Collections.Generic;
@@ -41,7 +42,7 @@ public partial class MainWindow : Window
 
 	private System.Windows.Point _center => new(ShowedImage.Width / 2, ShowedImage.Height / 2);
 
-	private GraphicLibrary.Models.LineF? _mirrorAxeLine;
+	private LineF? _mirrorAxeLine;
 
 	public MainWindow()
 	{
@@ -84,14 +85,13 @@ public partial class MainWindow : Window
 		if(_currentState == States.WaitingFirstPoint) {
 			DebugOut.Text = $"({(int)pos.X}; {(int)pos.Y}) ... Ожидание следующей точки.";
 			_currentState = States.WaitingNextPoint;
-		} 
-		else if(_currentState == States.WaitingNextPoint) {
+		} else if(_currentState == States.WaitingNextPoint) {
 			DebugOut.Text = $"({(int)pos.X}; {(int)pos.Y}) ... Ожидание следующей точки.";
 			_drawer.AddLine(_points[_points.Count - 2], _points[_points.Count - 1], null, ALinearElement.GetDefaultPatternResolver());
 			_lines.Add(new(_points[_points.Count - 2], _points[_points.Count - 1]));
 		}
 
-		if(_points.Count>2) LoopButton.IsEnabled = true;
+		if(_points.Count > 2) LoopButton.IsEnabled = true;
 
 		_drawer.RenderFrame();
 		ShowedImage.Source = _drawer.CurrentFrameImage;
@@ -106,7 +106,7 @@ public partial class MainWindow : Window
 		LoopButton.IsEnabled = false;
 
 		_drawer.AddLine(
-			_points[_points.Count-1], _points[0],
+			_points[_points.Count - 1], _points[0],
 			null, ALinearElement.GetDefaultPatternResolver());
 
 		_drawer.RenderFrame();
@@ -114,6 +114,45 @@ public partial class MainWindow : Window
 
 		PerimeterOut.Text = Common.FindPerimeter(_lines).ToString();
 		AreaOut.Text = Common.FindArea(_lines).ToString();
+	}
+
+	private void Interpolate_Click(object sender, RoutedEventArgs e)
+	{
+		_drawer.LagrangePolynomials.Clear();
+
+		var pattern = isPatternValid()
+			? CreateUserResolver()
+			: GraphicLibrary.Models.Line.GetPatternResolver16();
+
+		var poly = new LagrangePolynomial(_points, (float)StepSelector.Value, System.Drawing.Color.AliceBlue,pattern);
+		_drawer.LagrangePolynomials.Add(poly);
+
+		_drawer.RenderFrame();
+		ShowedImage.Source = _drawer.CurrentFrameImage;
+	}
+
+
+
+	private bool isPatternValid()
+	{
+		var userPattern = this.PatterResolver.Text;
+		if(string.IsNullOrWhiteSpace(userPattern) || userPattern.Any(c => c != '+' && c != '-')) {
+			this.PatterResolver.Background = new SolidColorBrush(Colors.LightCoral);
+			return false;
+		}
+
+		this.PatterResolver.Background = new SolidColorBrush(Colors.LightGreen);
+		return true;
+	}
+	private IEnumerator<bool> CreateUserResolver()
+	{
+		var userPattern = this.PatterResolver.Text;
+		while(true) {
+			foreach(char c in userPattern) {
+				if(c == '+') yield return true;
+				if(c == '-') yield return false;
+			}
+		}
 	}
 }
 

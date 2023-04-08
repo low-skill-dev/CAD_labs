@@ -3,15 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "labs_1_2_3_4_5_6", "labs_1_2_3_4_5_6\labs_1_2_3_4_5_6.csproj", "{3A914467-E326-49F6-A26E-7E2C3FA21161}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "labs_1_2_3_4_5_6_8", "labs_1_2_3_4_5_6_8\labs_1_2_3_4_5_6_8.csproj", "{3A914467-E326-49F6-A26E-7E2C3FA21161}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lab7", "lab7\lab7.csproj", "{FCE0863F-BBAE-437E-8909-A476F04153FE}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lab8", "lab8\lab8.csproj", "{54917F73-98E6-4832-98D8-F9AA565546B2}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lab9", "lab9\lab9.csproj", "{D12A515B-66FB-4794-8ED1-DFE597A336C2}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lab10", "lab10\lab10.csproj", "{50FA609F-6EFD-4675-874B-F867C82EF138}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "labs_7_9_10", "labs_7_9_10\labs_7_9_10.csproj", "{FCE0863F-BBAE-437E-8909-A476F04153FE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphicLibrary", "GraphicLibrary\GraphicLibrary.csproj", "{73C6392B-8ADA-437D-B74A-F97AB0BC5A2F}"
 EndProject

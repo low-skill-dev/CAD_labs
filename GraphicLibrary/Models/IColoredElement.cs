@@ -6,14 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace GraphicLibrary.Models;
-public struct LineF
+public interface IColoredElement
 {
-	public PointF Start;
-	public PointF End;
-
-	public LineF(PointF start, PointF end)
-	{
-		Start = start;
-		End = end;
-	}
+	public Color Color { get; init; }
 }
