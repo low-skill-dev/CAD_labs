@@ -13,6 +13,15 @@ public class InterpolatedPoints: ALinearElement
 	public IList<PointF> Points { get; private set; }
 	public float StepsBetweenPoints { get; set; }
 	public int Degree { get; set; } = 2;
+	public float BendingFactor { get; set; } = 0.5f;
+	public bool FirstSplineCorrection { get; set; } = true;
+	public bool DebugDraw { get; set; } =
+#if DEBUG
+		true
+#else
+		false
+#endif
+		;
 
 	public InterpolatedPoints(IList<PointF> points, float stepsBetweenPoints, Color color, IEnumerator<bool>? patternResolver = null)
 		:base(color,patternResolver)

@@ -25,6 +25,7 @@ public class BitmapDrawer
 	public List<AreaFiller> AreaFillers { get; private set; } = new();
 	public List<InterpolatedPoints> InterpolatedPoints { get; private set; } = new();
 	public List<InterpolatedPoints> LagrangePolys { get; private set; } = new();
+	public List<InterpolatedPoints> Besie2Polys { get; private set; } = new();
 	public List<IGraphicalElement> ConstantObjects { get; private set; } = new();
 
 	public bool AddAxes { get; set; } = true;
@@ -45,6 +46,7 @@ public class BitmapDrawer
 		this.AreaFillers.Clear();
 		this.InterpolatedPoints.Clear();
 		this.LagrangePolys.Clear();
+		this.Besie2Polys.Clear();
 		this.CurrentFrame = new Bitmap(FrameWidth, FrameHeight);
 	}
 
@@ -68,6 +70,7 @@ public class BitmapDrawer
 		this.AreaFillers.ForEach(x => FillAreaFrom(x));
 		this.InterpolatedPoints.ForEach(x => DrawInterpolated(x));
 		this.LagrangePolys.ForEach(x => DrawLagrange(x));
+		this.Besie2Polys.ForEach(x => DrawBesie2(x));
 		foreach(var obj in ConstantObjects) {
 			if(obj is null) continue;
 
@@ -301,10 +304,17 @@ public class BitmapDrawer
 		for(int i = 0; i < lines.Length - 1; i++) {
 			var curr = lines[i];
 			var next = lines[i + 1];
-			DrawLine(curr, next, Color.Aqua, resolver);
+			DrawLine(curr, next, poly.Color, resolver);
+
+			if(poly.DebugDraw) {
+				DrawCircle(curr, 3, Color.Yellow, ALinearElement.GetDefaultPatternResolver());
+			}
 		}
 
-		DrawLine(lines[lines.Length - 1], lines[0], Color.Aqua, poly.PatternResolver);
+		DrawLine(lines[lines.Length - 1], lines[0], poly.Color, poly.PatternResolver);
+		if(poly.DebugDraw) {
+			DrawCircle(lines[lines.Length - 1], 3, Color.Yellow, ALinearElement.GetDefaultPatternResolver());
+		}
 	}
 	#endregion
 
@@ -324,6 +334,33 @@ public class BitmapDrawer
 				DrawLine(prev, curr, poly.Color, poly.PatternResolver);
 
 			prev = curr;
+
+			if(poly.DebugDraw) {
+				DrawCircle(curr, 3, Color.Yellow, ALinearElement.GetDefaultPatternResolver());
+			}
+		}
+	}
+	#endregion
+	#region Besie2
+	private void DrawBesie2(InterpolatedPoints poly)
+	{
+		var points = poly.Points;
+		var lines = Besie.Calculate(points, (int)Round(poly.StepsBetweenPoints),poly.BendingFactor,poly.FirstSplineCorrection);
+
+		var resolver = poly.PatternResolver;
+		for(int i = 0; i < lines.Count - 1; i++) {
+			var curr = lines[i];
+			var next = lines[i + 1];
+			DrawLine(curr, next, poly.Color, resolver);
+
+			if(poly.DebugDraw) {
+				DrawCircle(curr, 3, Color.Yellow, ALinearElement.GetDefaultPatternResolver());
+			}
+		}
+
+		DrawLine(lines[lines.Count - 1], lines[0], poly.Color, poly.PatternResolver);
+		if(poly.DebugDraw) {
+			DrawCircle(lines[lines.Count - 1], 3, Color.Yellow, ALinearElement.GetDefaultPatternResolver());
 		}
 	}
 	#endregion
