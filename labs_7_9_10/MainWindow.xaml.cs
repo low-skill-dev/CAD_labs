@@ -17,7 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
+using PointF = GraphicLibrary.MathModels.PointF;
 namespace lab7;
 
 
@@ -55,6 +55,9 @@ public partial class MainWindow : Window
 		_drawer.RenderFrame();
 		this.ShowedImage.Source = Common.BitmapToImageSource(_drawer.CurrentFrame);
 
+		this.SliderSelected.Text = ((int)Math.Round(StepSelector.Value)).ToString();
+		this.SliderDegreeSelected.Text = ((int)Math.Round(DegreeSelector.Value)).ToString();
+		this.LagrangeSliderSelected.Text = ((int)Math.Round(LagrangeStepSelector.Value)).ToString();
 		DebugOut.Text = $"Ожидание первой точки.";
 	}
 
@@ -118,14 +121,16 @@ public partial class MainWindow : Window
 
 	private void Interpolate_Click(object sender, RoutedEventArgs e)
 	{
-		_drawer.LagrangePolynomials.Clear();
+		_drawer.InterpolatedPoints.Clear();
 
 		var pattern = isPatternValid()
 			? CreateUserResolver()
 			: GraphicLibrary.Models.Line.GetPatternResolver16();
 
-		var poly = new LagrangePolynomial(_points, (float)StepSelector.Value, System.Drawing.Color.AliceBlue,pattern);
-		_drawer.LagrangePolynomials.Add(poly);
+		var poly = new InterpolatedPoints(_points, (float)StepSelector.Value, System.Drawing.Color.AliceBlue, pattern) {
+			Degree = (int)Math.Round(DegreeSelector.Value)
+		};
+		_drawer.InterpolatedPoints.Add(poly);
 
 		_drawer.RenderFrame();
 		ShowedImage.Source = _drawer.CurrentFrameImage;
@@ -153,6 +158,29 @@ public partial class MainWindow : Window
 				if(c == '-') yield return false;
 			}
 		}
+	}
+
+	private void StepSelector_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+	{
+		this.SliderSelected.Text = ((int)Math.Round(StepSelector.Value)).ToString();
+		this.SliderDegreeSelected.Text = ((int)Math.Round(DegreeSelector.Value)).ToString();
+		this.LagrangeSliderSelected.Text = ((int)Math.Round(LagrangeStepSelector.Value)).ToString();
+	}
+
+	private void DrawLagrangeBT_Click(object sender, RoutedEventArgs e)
+	{
+		_drawer.LagrangePolys.Clear();
+
+		var pattern = GraphicLibrary.Models.Line.GetDefaultPatternResolver();
+
+		var poly = new InterpolatedPoints(_points, (float)LagrangeStepSelector.Value, System.Drawing.Color.FloralWhite, pattern) {
+			Degree = (int)Math.Round(DegreeSelector.Value)
+		};
+
+		_drawer.LagrangePolys.Add(poly);
+
+		_drawer.RenderFrame();
+		ShowedImage.Source = _drawer.CurrentFrameImage;
 	}
 }
 

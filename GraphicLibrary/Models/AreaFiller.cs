@@ -4,6 +4,8 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GraphicLibrary.MathModels;
+using PointF = GraphicLibrary.MathModels.PointF;
 
 namespace GraphicLibrary.Models;
 public class AreaFiller : IGraphicalElement, IColoredElement
@@ -20,7 +22,7 @@ public class AreaFiller : IGraphicalElement, IColoredElement
 
 	public void Move(float dX, float dY)
 	{
-		StartFilling += new SizeF(dX, dY);
+		StartFilling += new PointF(dX, dY);
 	}
 	public void Rotate(float angleR, PointF relativeTo)
 	{

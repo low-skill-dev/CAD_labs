@@ -4,6 +4,8 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GraphicLibrary.MathModels;
+using PointF = GraphicLibrary.MathModels.PointF;
 
 namespace GraphicLibrary.Models;
 public interface IGraphicalElement

@@ -5,17 +5,20 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PointF = GraphicLibrary.MathModels.PointF;
 
 namespace GraphicLibrary.Models;
-public class LagrangePolynomial:ALinearElement
+public class InterpolatedPoints: ALinearElement
 {
 	public IList<PointF> Points { get; private set; }
-	public float LineStep { get; set; }
-	public LagrangePolynomial(IList<PointF> points, float linearization, Color color, IEnumerator<bool>? patternResolver = null)
+	public float StepsBetweenPoints { get; set; }
+	public int Degree { get; set; } = 2;
+
+	public InterpolatedPoints(IList<PointF> points, float stepsBetweenPoints, Color color, IEnumerator<bool>? patternResolver = null)
 		:base(color,patternResolver)
 	{
 		this.Points = points;
-		LineStep = linearization;
+		this.StepsBetweenPoints = stepsBetweenPoints;
 	}
 
 	/* Для задачи генерации кривой безье через заданные точки существует т.н. интерполяционный многочлен Лагранжа
@@ -26,7 +29,7 @@ public class LagrangePolynomial:ALinearElement
 	 * li = product(i=0...n-1, j=0...n-1, i!=j) { (x-xj)/(xi-xj) }
 	 * ru.wikipedia.org/wiki/Интерполяционный_многочлен_Лагранжа
 	 */
-	public float CalcY(float x)
+	public float CalcLagrangeY(float x)
 	{
 		float prod, sum = 0;
 		for(int i = 0; i < Points.Count; i++) {
@@ -47,34 +50,41 @@ public class LagrangePolynomial:ALinearElement
 		return sum;
 	}
 
-	
+
 	public override void Move(float dX, float dY)
 	{
-		throw new NotImplementedException();
+		var d = new PointF(dX, dY);
+		for(int i = 0;i < Points.Count;i++) {
+			Points[i] += d;
+		}
 	}
-
-	public override void Rotate(float angleR, PointF relativeTo)
+	public override void Rotate(float angleR, MathModels.PointF relativeTo)
 	{
-		throw new NotImplementedException();
+		for(int i = 0; i < Points.Count; i++) {
+			Points[i] = Common.RotatePoint(Points[i],relativeTo,angleR);
+		}
 	}
-
-	public override void Scale(float scale, PointF relativeTo)
+	public override void Scale(float scale, MathModels.PointF relativeTo)
 	{
-		throw new NotImplementedException();
+		for(int i = 0; i < Points.Count; i++) {
+			Points[i] = Common.ScalePoint(Points[i], relativeTo, scale);
+		}
 	}
-
-	public override void Mirror(PointF relativeTo)
+	public override void Mirror(MathModels.PointF relativeTo)
 	{
-		throw new NotImplementedException();
+		for(int i = 0; i < Points.Count; i++) {
+			Points[i] = Common.MirrorPoint(Points[i], relativeTo);
+		}
 	}
-
-	public override void Mirror(LineF relativeTo)
+	public override void Mirror(MathModels.LineF relativeTo)
 	{
-		throw new NotImplementedException();
+		for(int i = 0; i < Points.Count; i++) {
+			Points[i] = Common.MirrorPoint(Points[i], relativeTo);
+		}
 	}
-
-	public override IGraphicalElement Clone()
+	public override InterpolatedPoints Clone()
 	{
-		throw new NotImplementedException();
+		var clone = new PointF[Points.Count]; Points.CopyTo(clone, 0);
+		return new InterpolatedPoints(clone, this.StepsBetweenPoints, this.Color, this.PatternResolver);
 	}
 }

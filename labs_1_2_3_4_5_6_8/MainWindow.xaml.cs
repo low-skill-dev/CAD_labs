@@ -1,4 +1,5 @@
 ﻿using GraphicLibrary;
+using GraphicLibrary.MathModels;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -15,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using PointF = GraphicLibrary.MathModels.PointF;
 
 namespace lab5;
 
@@ -123,7 +125,7 @@ public partial class MainWindow : Window
 				var prev = _prevMirror!.Value;
 				var curr = pos;
 
-				var start = new PointF((float)prev.X, (float)prev.Y);
+				var start = (PointF)prev;
 				var end = new PointF((float)curr.X, (float)curr.Y);
 				_drawer.ConstantObjects.Clear();
 				_drawer.ConstantObjects.Add(new GraphicLibrary.Models.Line(start,end,System.Drawing.Color.Red,null));

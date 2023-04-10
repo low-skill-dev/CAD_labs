@@ -8,6 +8,7 @@ using System.IO;
 using static System.MathF;
 using System.Security.Cryptography.X509Certificates;
 using GraphicLibrary.MathModels;
+using PointF = GraphicLibrary.MathModels.PointF;
 
 namespace GraphicLibrary;
 
@@ -31,7 +32,7 @@ public class Common
 
 	// System.Windows.Point -> System.Drawing.PointF
 	public static PointF WindowsToDrawing(System.Windows.Point p)
-		=> new System.Drawing.PointF((float)p.X, (float)p.Y);
+		=> new PointF((float)p.X, (float)p.Y);
 
 	// радиус окружности по теореме пифагора
 	public static float GetCirleRadius(PointF center, PointF onCirle)
@@ -42,7 +43,7 @@ public class Common
 	}
 
 	// Находит угол отклонения точки по её положению относительно центра окружности
-	public static float FindAngleOfPointOnCircle(System.Drawing.PointF target, System.Drawing.PointF center)
+	public static float FindAngleOfPointOnCircle(PointF target, PointF center)
 	{
 		int part = 0; // найдем четверть окружности
 		float rx = target.X - center.X, ry = target.Y - center.Y; // relativeX, relativeY
@@ -67,7 +68,7 @@ public class Common
 		float X = radius * (part % 2 == 1 ? Cos(angleR) : Sin(angleR));
 		float Y = radius * (part % 2 == 1 ? Sin(angleR) : Cos(angleR));
 
-		return center + (part % 2 == 1 ? new SizeF(X, Y) : new SizeF(Y, X));
+		return center + (part % 2 == 1 ? new PointF(X, Y) : new PointF(Y, X));
 	}
 
 	/* Реализация этого алгоритма не является очевидной...
@@ -78,7 +79,7 @@ public class Common
 	 * Поскольку изначально мы не знаем даже угла точки на окружности - сначала вычислим его.
 	 * Потом добавим к нему angleR. Далее, определив четверть, сможем решить обычное уравнение.
 	 */
-	public static PointF RotatePoint(System.Drawing.PointF target, System.Drawing.PointF relativeTo, float angleR)
+	public static PointF RotatePoint(PointF target, PointF relativeTo, float angleR)
 	{
 		if(angleR == 0) return target; // поворот на ноль
 		if(target.Equals(relativeTo)) return target; // поворот относительно себя самой не изменяет точку
@@ -100,7 +101,7 @@ public class Common
 	/* Задача масштабирования ялвяется, по-сути, подзадачей к вращению точки и де-факто уже была решена выше.
 	 * Получим угол поворот относительно точки relativeTo, увеличим радиус в Scale раз, вернем новую точку...
 	 */
-	public static PointF ScalePoint(System.Drawing.PointF target, System.Drawing.PointF relativeTo, float scale)
+	public static PointF ScalePoint(PointF target, PointF relativeTo, float scale)
 	{
 		var radius = GetCirleRadius(relativeTo, target);
 		var angle = FindAngleOfPointOnCircle(target, relativeTo);
@@ -111,7 +112,7 @@ public class Common
 	 * и представляет собой ничто иное, как поворот точки на 180 градусов, а равно на 3.1415 радиан
 	 * относительно центра окружности в точке relativeTo.
 	 */
-	public static PointF MirrorPoint(System.Drawing.PointF target, System.Drawing.PointF relativeTo)
+	public static PointF MirrorPoint(PointF target, PointF relativeTo)
 	{
 		return RotatePoint(target, relativeTo, PI);
 	}
@@ -166,7 +167,7 @@ public class Common
 	 * Этот случай следует рассмотреть отдельно. По сути, в данном случае необходимо просто переместить точку в
 	 * сторону прямой на 2*(разницу по Х).
 	 */
-	public static PointF MirrorPoint(System.Drawing.PointF target, LineF relativeTo)
+	public static PointF MirrorPoint(PointF target, LineF relativeTo)
 	{
 		if(relativeTo.Start.X == relativeTo.End.X) {
 			return MirrorPoint(target, new PointF(relativeTo.Start.X, target.Y));

@@ -4,13 +4,15 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GraphicLibrary.MathModels;
+using PointF = GraphicLibrary.MathModels.PointF;
 
 namespace GraphicLibrary.Models;
 public class Dot : ALinearElement
 {
 	public PointF Point { get; private set; }
 
-	public Dot(System.Drawing.PointF point, Color color)
+	public Dot(PointF point, Color color)
 		: base(color, GetDefaultPatternResolver())
 	{
 		this.Point = point;
@@ -26,7 +28,7 @@ public class Dot : ALinearElement
 	}
 	public override void Move(float dX, float dY)
 	{
-		this.Point += new SizeF(dX, dY);
+		this.Point += new PointF(dX, dY);
 	}
 	public override void Rotate(float angleR, PointF relativeTo)
 	{

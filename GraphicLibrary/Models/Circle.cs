@@ -4,6 +4,8 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GraphicLibrary.MathModels;
+using PointF = GraphicLibrary.MathModels.PointF;
 
 namespace GraphicLibrary.Models;
 public sealed class Circle : ALinearElement
@@ -30,20 +32,15 @@ public sealed class Circle : ALinearElement
 	}
 
 	// by predefined radius
-	public Circle(System.Drawing.PointF center, float radius, Color color, IEnumerator<bool>? patternResolver = null)
+	public Circle(PointF center, float radius, Color color, IEnumerator<bool>? patternResolver = null)
 		: base(color, patternResolver)
 	{
 		this.Center = center;
 		this.Radius = radius;
 	}
-	public Circle(System.Windows.Point center, int radius, Color color, IEnumerator<bool>? patternResolver = null)
-		: this(Common.WindowsToDrawing(center), radius, color, patternResolver) { }
-
 	// by center and point on circle
-	public Circle(System.Drawing.PointF center, System.Drawing.PointF onCircle, Color color, IEnumerator<bool>? patternResolver = null)
+	public Circle(PointF center, PointF onCircle, Color color, IEnumerator<bool>? patternResolver = null)
 		: this(center, Common.GetCirleRadius(center, onCircle),color, patternResolver) { }
-	public Circle(System.Windows.Point center, System.Windows.Point onCircle, Color color, IEnumerator<bool>? patternResolver = null)
-		: this(Common.WindowsToDrawing(center), Common.WindowsToDrawing(onCircle), color, patternResolver) { }
 	#endregion
 
 	#region inherited or overriden
@@ -53,7 +50,7 @@ public sealed class Circle : ALinearElement
 	}
 	public override void Move(float dX, float dY)
 	{
-		this.Center += new SizeF(dX, dY);
+		this.Center += new PointF(dX, dY);
 	}
 	public override void Rotate(float angleR, PointF relativeTo) // basically rotate the center
 	{

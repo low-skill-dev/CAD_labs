@@ -4,6 +4,8 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GraphicLibrary.MathModels;
+using PointF = GraphicLibrary.MathModels.PointF;
 
 namespace GraphicLibrary.Models;
 public class Line : ALinearElement
@@ -35,15 +37,12 @@ public class Line : ALinearElement
 		}
 	}
 
-	public Line(System.Drawing.PointF start, System.Drawing.PointF end, Color color, IEnumerator<bool>? patternResolver = null)
+	public Line(PointF start, PointF end, Color color, IEnumerator<bool>? patternResolver = null)
 		: base(color, patternResolver)
 	{
 		this.Start = start;
 		this.End = end;
 	}
-
-	public Line(System.Windows.Point start, System.Windows.Point end, Color color, IEnumerator<bool>? patternResolver = null)
-		: this(Common.WindowsToDrawing(start), Common.WindowsToDrawing(end), color, patternResolver) { }
 
 	#region inherited or overriden
 	public override IGraphicalElement Clone()
@@ -52,8 +51,8 @@ public class Line : ALinearElement
 	}
 	public override void Move(float dX, float dY)
 	{
-		this.Start += new SizeF(dX, dY);
-		this.End += new SizeF(dX, dY);
+		this.Start += new PointF(dX, dY);
+		this.End += new PointF(dX, dY);
 	}
 	public override void Rotate(float angleR, PointF relativeTo)
 	{

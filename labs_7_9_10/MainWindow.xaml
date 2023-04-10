@@ -15,21 +15,38 @@
 					<Button Width="350" Name="ClearButton" Click="ClearButton_Click" FontSize="16">Очистить</Button>
 				</StackPanel>
 				<StackPanel Orientation="Horizontal">
-					<StackPanel Orientation="Vertical" Width="350">
+					<StackPanel Orientation="Vertical" Width="150">
 						<Label HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Периметр</Label>
-						<TextBox Name="PerimeterOut" Width="350" HorizontalAlignment="Center" FontSize="16" IsReadOnly="True"></TextBox>
+						<TextBox Name="PerimeterOut" Width="150" HorizontalAlignment="Center" FontSize="16" IsReadOnly="True"></TextBox>
 					</StackPanel>
-					<StackPanel Orientation="Vertical" Width="350">
+					<StackPanel Orientation="Vertical" Width="150">
 						<Label HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Площадь</Label>
-						<TextBox Name="AreaOut" Width="350" HorizontalAlignment="Center" FontSize="16" IsReadOnly="True"></TextBox>
+						<TextBox Name="AreaOut" Width="150" HorizontalAlignment="Center" FontSize="16" IsReadOnly="True"></TextBox>
 					</StackPanel>
 					<StackPanel Orientation="Vertical" Width="350">
 						<Label HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Интерполяция</Label>
 						<Button Name="Interpolate" Click="Interpolate_Click"  FontSize="16">Интерполировать</Button>
-						<Label HorizontalAlignment="Center" FontSize="16">Шаг</Label>
-						<Slider Minimum="1" Maximum="200" Value="1" Name="StepSelector"/>
+						<Label HorizontalAlignment="Center" FontSize="16">Узлов на сплайн (1 - 30)</Label>
+						<StackPanel Orientation="Horizontal" Width="350">
+							<Slider Minimum="1" Maximum="30" Width="300" Value="3" Name="StepSelector" PreviewMouseUp="StepSelector_PreviewMouseUp"/>
+							<TextBox Name="SliderSelected" IsReadOnly="True" Width="50"></TextBox>
+						</StackPanel>
+						<Label HorizontalAlignment="Center" FontSize="16">Порядок сплайна (2 - 6)</Label>
+						<StackPanel Orientation="Horizontal" Width="350">
+							<Slider Minimum="2" Maximum="6" Width="300" Value="3" Name="DegreeSelector" PreviewMouseUp="StepSelector_PreviewMouseUp"/>
+							<TextBox Name="SliderDegreeSelected" IsReadOnly="True" Width="50"></TextBox>
+						</StackPanel>
 						<Label HorizontalAlignment="Center" FontSize="16">Pattern Resolver</Label>
 						<TextBox Name="PatterResolver" Width="350" HorizontalAlignment="Center" FontSize="16">+</TextBox>
+					</StackPanel>
+					<StackPanel Orientation="Vertical" Width="350">
+						<Label HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Многочлен лагранжа</Label>
+						<Button Name="DrawLagrangeBT" Click="DrawLagrangeBT_Click"  FontSize="16">Построить</Button>
+						<Label HorizontalAlignment="Center" FontSize="16">Шаг по Х</Label>
+						<StackPanel Orientation="Horizontal" Width="350">
+							<Slider Minimum="1" Maximum="100" Width="300" Value="3" Name="LagrangeStepSelector" PreviewMouseUp="StepSelector_PreviewMouseUp"/>
+							<TextBox Name="LagrangeSliderSelected" IsReadOnly="True" Width="50"></TextBox>
+						</StackPanel>
 					</StackPanel>
 				</StackPanel>
 				
