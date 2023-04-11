@@ -10,18 +10,22 @@ using static System.MathF;
 using static System.Net.Mime.MediaTypeNames;
 using Point = System.Drawing.Point;
 using PointF = GraphicLibrary.MathModels.PointF;
+using Rectangle = GraphicLibrary.Models.Rectangle;
 
 namespace GraphicLibrary;
 public class BitmapDrawer
 {
-	private int FrameWidth { get; set; }
-	private int FrameHeight { get; set; }
+	protected int FrameWidth { get; set; }
+	protected int FrameHeight { get; set; }
+	
+	private FastBitmap? CurrentFastLock { get; set; }
 	public Bitmap CurrentFrame { get; private set; }
 	public BitmapImage CurrentFrameImage => Common.BitmapToImageSource(CurrentFrame);
 
 	public List<Dot> Dots { get; private set; } = new();
 	public List<Line> Lines { get; private set; } = new();
 	public List<Circle> Circles { get; private set; } = new();
+	public List<Rectangle> Rectangles { get; private set; } = new();
 	public List<AreaFiller> AreaFillers { get; private set; } = new();
 	public List<InterpolatedPoints> InterpolatedPoints { get; private set; } = new();
 	public List<InterpolatedPoints> LagrangePolys { get; private set; } = new();
@@ -42,6 +46,7 @@ public class BitmapDrawer
 	{
 		this.Dots.Clear();
 		this.Lines.Clear();
+		this.Rectangles.Clear();
 		this.Circles.Clear();
 		this.AreaFillers.Clear();
 		this.InterpolatedPoints.Clear();
@@ -52,38 +57,49 @@ public class BitmapDrawer
 
 	public void RenderFrame(bool noClear = false)
 	{
-		if(!noClear) this.CurrentFrame = new Bitmap(FrameWidth, FrameHeight);
+		using(var currentFastLock = this.CurrentFrame.FastLock()) {
+			this.CurrentFastLock = currentFastLock;
+			if(!noClear) this.CurrentFastLock.Clear(Color.FromArgb(0,0,0,0));
 
-		if(AddAxes) {
-			var left = new PointF(0, FrameHeight / 2);
-			var right = new PointF(FrameWidth, FrameHeight / 2);
-			var up = new PointF(FrameWidth / 2, 0);
-			var down = new PointF(FrameWidth / 2, FrameWidth);
+			this.Dots.ForEach(DrawDot);
+			this.Lines.ForEach(DrawLine);
+			this.Rectangles.ForEach(DrawRectangle);
+			this.Circles.ForEach(DrawCircle);
+			this.AreaFillers.ForEach(x => FillAreaFrom(x));
+			this.InterpolatedPoints.ForEach(x => DrawInterpolated(x));
+			this.LagrangePolys.ForEach(x => DrawLagrange(x));
+			this.Besie2Polys.ForEach(x => DrawBesie2(x));
 
-			this.DrawLine(left, right, Color.Orange, ALinearElement.GetDefaultPatternResolver());
-			this.DrawLine(up, down, Color.Orange, ALinearElement.GetDefaultPatternResolver());
+			if(AddAxes) {
+				var left = new PointF(0, FrameHeight / 2);
+				var right = new PointF(FrameWidth, FrameHeight / 2);
+				var up = new PointF(FrameWidth / 2, 0);
+				var down = new PointF(FrameWidth / 2, FrameWidth);
+
+				this.DrawLine(left, right, Color.Orange, ALinearElement.GetDefaultPatternResolver());
+				this.DrawLine(up, down, Color.Orange, ALinearElement.GetDefaultPatternResolver());
+			}
+			foreach(var obj in ConstantObjects) {
+				if(obj is null) continue;
+
+				if(obj is Dot) this.DrawDot((Dot)obj);
+				if(obj is Line) this.DrawLine((Line)obj);
+				if(obj is Circle) this.DrawCircle((Circle)obj);
+			}
 		}
-
-		this.Dots.ForEach(DrawDot);
-		this.Lines.ForEach(DrawLine);
-		this.Circles.ForEach(DrawCircle);
-		this.AreaFillers.ForEach(x => FillAreaFrom(x));
-		this.InterpolatedPoints.ForEach(x => DrawInterpolated(x));
-		this.LagrangePolys.ForEach(x => DrawLagrange(x));
-		this.Besie2Polys.ForEach(x => DrawBesie2(x));
-		foreach(var obj in ConstantObjects) {
-			if(obj is null) continue;
-
-			if(obj is Dot) this.DrawDot((Dot)obj);
-			if(obj is Line) this.DrawLine((Line)obj);
-			if(obj is Circle) this.DrawCircle((Circle)obj);
-		}
+		this.CurrentFastLock = null;
 	}
 
+	#region no-render methods
+
+	public void AddPoint(Dot dot) => this.Dots.Add(dot);
+	[Obsolete]
 	public void AddPoint(PointF point, Color? color = null)
 	{
 		Dots.Add(new(point, color ?? Color.LightGreen));
 	}
+	public void AddLine(Line line) => this.Lines.Add(line);
+	[Obsolete]
 	public void AddLine(PointF start, PointF end, Color? color = null, IEnumerator<bool>? patternResolver = null)
 	{
 		if(start.Equals(end)) {
@@ -93,6 +109,12 @@ public class BitmapDrawer
 
 		Lines.Add(new(start, end, color ?? Color.LightGreen, patternResolver ?? ALinearElement.GetDefaultPatternResolver()));
 	}
+	public void AddRectangle(Rectangle rect)
+	{
+		this.Rectangles.Add(rect);
+	}
+	public void AddCircle(Circle circle)=>	Circles.Add(circle);
+	[Obsolete]
 	public void AddCircle(PointF center, PointF onCircle, Color? color = null, IEnumerator<bool>? patternResolver = null)
 	{
 		if(center.Equals(onCircle)) {
@@ -110,12 +132,17 @@ public class BitmapDrawer
 	{
 		this.InterpolatedPoints.Add(polynomial);
 	}
+	#endregion
 
 	public IEnumerator<IGraphicalElement> GetElements()
 	{
-		for(int i = 0; i < Dots.Count; i++) yield return Dots[i];
-		for(int i = 0; i < Lines.Count; i++) yield return Lines[i];
-		for(int i = 0; i < Circles.Count; i++) yield return Circles[i];
+		foreach(var obj in Dots) yield return obj;
+		foreach(var obj in Lines) yield return obj;
+		foreach(var obj in Circles) yield return obj;
+		foreach(var obj in AreaFillers) yield return obj;
+		foreach(var obj in InterpolatedPoints) yield return obj;
+		foreach(var obj in LagrangePolys) yield return obj;
+		foreach(var obj in Besie2Polys) yield return obj;
 	}
 
 	public void MoveAll(float dX, float dY)
@@ -135,18 +162,33 @@ public class BitmapDrawer
 				elements.Current.Rotate(angleR, relativeTo);
 			}
 		} else {
-			List<IGraphicalElement> enumerated = new();
-			while(elements.MoveNext()) {
-				enumerated.Add(elements.Current);
+			foreach(var obj in Dots) {
+				this.Dots.Add(obj.Clone());
+				this.Dots.At(-1).Rotate(angleR, relativeTo);
 			}
-
-			foreach(var element in enumerated) {
-				var copy = element.Clone();
-				copy.Rotate(angleR, relativeTo);
-
-				if(copy is Dot) this.Dots.Add((Dot)copy);
-				if(copy is Line) this.Lines.Add((Line)copy);
-				if(copy is Circle) this.Circles.Add((Circle)copy);
+			foreach(var obj in Lines) {
+				this.Lines.Add(obj.Clone());
+				this.Lines.At(-1).Rotate(angleR, relativeTo);
+			}
+			foreach(var obj in Circles) { 
+				this.Circles.Add(obj.Clone());
+				this.Circles.At(-1).Rotate(angleR, relativeTo);
+			}
+			foreach(var obj in AreaFillers) {
+				this.AreaFillers.Add((AreaFiller)obj.Clone());
+				this.AreaFillers.At(-1).Rotate(angleR, relativeTo);
+			}
+			foreach(var obj in InterpolatedPoints) {
+				this.InterpolatedPoints.Add(obj.Clone());
+				this.InterpolatedPoints.At(-1).Rotate(angleR, relativeTo);
+			}
+			foreach(var obj in LagrangePolys) {
+				this.LagrangePolys.Add(obj.Clone());
+				this.LagrangePolys.At(-1).Rotate(angleR, relativeTo);
+			}
+			foreach(var obj in Besie2Polys) {
+				this.Besie2Polys.Add(obj.Clone());
+				this.Besie2Polys.At(-1).Rotate(angleR, relativeTo);
 			}
 		}
 	}
@@ -206,7 +248,7 @@ public class BitmapDrawer
 		if(isValidPoint(point)) {
 			patternResolver.MoveNext();
 			if(patternResolver.Current)
-				this.CurrentFrame.SetPixel((int)Round(point.X), (int)Round(point.Y), color);
+				this.CurrentFastLock!.SetPixel((int)Round(point.X), (int)Round(point.Y), color);
 		}
 	}
 	#endregion
@@ -269,11 +311,11 @@ public class BitmapDrawer
 		points.Push(start);
 
 		while(points.TryPop(out var point)) {
-			CurrentFrame.SetPixel(point.X, point.Y, newColor);
+			BypassPoint(new(point.X, point.Y), newColor,ALinearElement.GetDefaultPatternResolver());
 			for(int dx = -1; dx < 2; dx += 2) {
 				Point target = new(point.X + dx, point.Y);
 				if(isValidPoint(target)) {
-					if(CurrentFrame.GetPixel(target.X, target.Y).Equals(baseColor)) {
+					if(CurrentFastLock.GetPixel(target.X, target.Y).Equals(baseColor)) {
 						points.Push(target);
 					}
 				}
@@ -281,7 +323,7 @@ public class BitmapDrawer
 			for(int dy = -1; dy < 2; dy += 2) {
 				Point target = new(point.X, point.Y + dy);
 				if(isValidPoint(target)) {
-					if(CurrentFrame.GetPixel(target.X, target.Y).Equals(baseColor)) {
+					if(CurrentFastLock.GetPixel(target.X, target.Y).Equals(baseColor)) {
 						points.Push(target);
 					}
 				}
@@ -345,7 +387,7 @@ public class BitmapDrawer
 	private void DrawBesie2(InterpolatedPoints poly)
 	{
 		var points = poly.Points;
-		var lines = Besie.Calculate(points, (int)Round(poly.StepsBetweenPoints),poly.BendingFactor,poly.FirstSplineCorrection);
+		var lines = Besie.Calculate(points, (int)Round(poly.StepsBetweenPoints), poly.BendingFactor, poly.FirstSplineCorrection);
 
 		var resolver = poly.PatternResolver;
 		for(int i = 0; i < lines.Count - 1; i++) {
@@ -362,6 +404,21 @@ public class BitmapDrawer
 		if(poly.DebugDraw) {
 			DrawCircle(lines[lines.Count - 1], 3, Color.Yellow, ALinearElement.GetDefaultPatternResolver());
 		}
+	}
+	#endregion
+	#region rectangle
+	private void DrawRectangle(Rectangle rect)
+	{
+		var start = rect.Start;
+		var end = rect.End;
+
+		var right = new PointF(end.X, start.Y);
+		var left = new PointF(start.X, end.Y);
+
+		this.DrawLine(start, right, rect.Color,rect.PatternResolver);
+		this.DrawLine(right, end, rect.Color, rect.PatternResolver);
+		this.DrawLine(end, left, rect.Color, rect.PatternResolver);
+		this.DrawLine(left, start, rect.Color, rect.PatternResolver);
 	}
 	#endregion
 

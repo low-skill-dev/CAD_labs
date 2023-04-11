@@ -45,7 +45,7 @@ public class Line : ALinearElement
 	}
 
 	#region inherited or overriden
-	public override IGraphicalElement Clone()
+	public override Line Clone()
 	{
 		return new Line(this.Start, this.End, this.Color, this.PatternResolver);
 	}

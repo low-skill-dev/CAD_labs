@@ -239,6 +239,8 @@ public partial class MainWindow : Window
 
 	private void MoveButton_Click(object sender, RoutedEventArgs e)
 	{
+		if(string.IsNullOrWhiteSpace(diffX.Text)) diffX.Text = "0";
+		if(string.IsNullOrWhiteSpace(diffY.Text)) diffY.Text = "0";
 		try {
 			var dX = int.Parse(diffX.Text);
 			var dY = int.Parse(diffY.Text);

@@ -44,7 +44,7 @@ public sealed class Circle : ALinearElement
 	#endregion
 
 	#region inherited or overriden
-	public override IGraphicalElement Clone()
+	public override Circle Clone()
 	{
 		return new Circle(this.Center,this.Radius,this.Color,this.PatternResolver);
 	}

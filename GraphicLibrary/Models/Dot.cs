@@ -22,7 +22,7 @@ public class Dot : ALinearElement
 		: this(Common.WindowsToDrawing(point), color) { }
 
 	#region inherited or overriden
-	public override IGraphicalElement Clone()
+	public override Dot Clone()
 	{
 		return new Dot(this.Point, this.Color);
 	}

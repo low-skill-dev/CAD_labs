@@ -30,6 +30,11 @@ public class Common
 		}
 	}
 
+	public PointF PointsAverage(PointF first, PointF second)
+	{
+		return (first + second) / 2;
+	}
+
 	// System.Windows.Point -> System.Drawing.PointF
 	public static PointF WindowsToDrawing(System.Windows.Point p)
 		=> new PointF((float)p.X, (float)p.Y);
