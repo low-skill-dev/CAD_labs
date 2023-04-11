@@ -1,4 +1,4 @@
-﻿using GamingLibrary;
+﻿using InteractiveLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,16 +27,21 @@ public partial class MainWindow : Window
 	private float BallAccel;
 	private int totalRoundsPlayed;
 	private int wonRounds;
+	private bool disableBallFilling;
 	public MainWindow()
 	{
 		InitializeComponent();
+		disableBallFilling = true;
+
+		//gameRender = new((int)GameImage.Width, (int)GameImage.Height, 10) {
+		//	DisableBallFilling = disableBallFilling,
+		//	UseRandomColors = true
+		//};
+		//gameRender.StartNewGame();
+		//gameRender.RenderCurrentState();
 
 
-		gameRender = new((int)GameImage.Width, (int)GameImage.Height, 20);
-		gameRender.StartNewGame();
-		gameRender.RenderCurrentState();
-
-		GameImage.Source = gameRender.CurrentFrameImage;
+		//GameImage.Source = gameRender.CurrentFrameImage;
 	}
 
 	private void StartNewGameBT_Click(object sender, RoutedEventArgs e)
@@ -46,7 +51,10 @@ public partial class MainWindow : Window
 			this.BallAccelerationTB.Text = BallAccel.ToString("0.00");
 		}
 		var parsed = int.TryParse(BallAccelerationTB.Text, out int accel);
-		gameRender = new((int)GameImage.Width, (int)GameImage.Height, 20, ballAcceleration: parsed ? accel : BallAccel);
+		gameRender = new((int)GameImage.Width, (int)GameImage.Height, 10, ballAcceleration: parsed ? accel : BallAccel) {
+			DisableBallFilling = disableBallFilling,
+			UseRandomColors = true
+		};
 
 
 		StartNewGameBT.IsEnabled = false;
@@ -76,7 +84,7 @@ public partial class MainWindow : Window
 						breakThread = true;
 						wonRounds++;
 						this.BallAccel *= 1.5f;
-						this.BallAccelerationTB.Text = BallAccel.ToString("0.00");
+						this.BallAccelerationTB.Text = ((int)BallAccel).ToString();
 						UpdateTBs();
 					} finally {
 						gameRender.RenderCurrentState();

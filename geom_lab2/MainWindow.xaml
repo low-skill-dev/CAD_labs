@@ -1,0 +1,27 @@
+﻿<Window x:Class="geom_lab2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:geom_lab2"
+        mc:Ignorable="d"
+        Title="MainWindow" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
+	<Grid>
+		<StackPanel Orientation="Horizontal" Width="1200">
+			<StackPanel Orientation="Vertical" Width="290" Margin="5">
+				<Button Name="ClearPointsBT">Очистить</Button>
+				<StackPanel Orientation="Horizontal">
+					<Label Margin="64,0,0,0" HorizontalAlignment="Right">X</Label>
+					<Label Margin="128,0,0,0">Y</Label>
+				</StackPanel>
+				<StackPanel Name="DisplayedDotsSP" Orientation="Vertical">
+					<StackPanel Orientation="Horizontal">
+						<TextBox Width="145"></TextBox>
+						<TextBox Width="145"></TextBox>
+					</StackPanel>
+				</StackPanel>
+			</StackPanel>
+			<Image MouseDown="GameImage_MouseDown" MouseMove="GameImage_MouseMove" Name="GameImage" Width="900" Height="600"></Image>
+		</StackPanel>
+	</Grid>
+</Window>

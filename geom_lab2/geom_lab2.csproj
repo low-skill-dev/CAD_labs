@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GamingLibrary\InteractiveLibrary.csproj" />
+    <ProjectReference Include="..\GraphicLibrary\GraphicLibrary.csproj" />
   </ItemGroup>
 
 </Project>

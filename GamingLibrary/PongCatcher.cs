@@ -9,7 +9,7 @@ using GraphicLibrary.Models;
 using Microsoft.VisualBasic.Logging;
 using PointF = GraphicLibrary.MathModels.PointF;
 
-namespace GamingLibrary;
+namespace InteractiveLibrary;
 
 public class GameException : Exception
 {
@@ -62,7 +62,9 @@ public class FallingBall // not struct coz we need refs
 public class PongCatcher : BitmapDrawer
 {
 	private IEnumerator<bool> _defaultPattern { get; init; }
-	private PointF _rightAndDown { get; init; }
+	private PointF _rightAndDown => new PointF(
+		this.PlatformWidth/2,
+		this.PlatformHeight/2);
 	private Circle? DefeatCircle { get; set; }
 
 	public int PlatformWidth { get; private set; }
@@ -76,8 +78,9 @@ public class PongCatcher : BitmapDrawer
 	public float BallRadius { get; private set; }
 	public Color BallBorderColor { get; private set; }
 	public Color BallFillColor { get; private set; }
+	public bool DisableBallFilling { get; set; }
 
-	public bool UseRandomColors { get; private set; }
+	public bool UseRandomColors { get; set; }
 
 	public List<FallingBall> Balls { get; private set; }
 	public List<FallingBall> FallingBalls { get; private set; }
@@ -105,7 +108,6 @@ public class PongCatcher : BitmapDrawer
 		this.UseRandomColors = useRandomColors ?? false;
 
 		this._defaultPattern = ALinearElement.GetDefaultPatternResolver();
-		this._rightAndDown = new Point(1, 1);
 		this.FallingBalls = new();
 	}
 
@@ -129,11 +131,13 @@ public class PongCatcher : BitmapDrawer
 
 		foreach(var ball in Balls) {
 			base.AddCircle(new(ball.Location, ball.Radius, ball.BorderColor, _defaultPattern));
-			//base.AddFiller(new(ball.Location, ball.FillColor)); // TODO: disable if low performance
+			if(!DisableBallFilling)
+				base.AddFiller(new(ball.Location, ball.FillColor)); // TODO: disable if low performance
 		}
 		foreach(var ball in FallingBalls) {
 			base.AddCircle(new(ball.Location, ball.Radius, ball.BorderColor, _defaultPattern));
-			//base.AddFiller(new(ball.Location, ball.FillColor)); // TODO: disable if low performance
+			if(!DisableBallFilling)
+				base.AddFiller(new(ball.Location, ball.FillColor)); // TODO: disable if low performance
 		}
 
 		if(DefeatCircle is not null) {
@@ -219,7 +223,7 @@ public class PongCatcher : BitmapDrawer
 					FallingBalls.Remove(ball);
 					i--;
 				} else {
-					DefeatCircle = new Circle(new(loc.X, PlatformLocation.Y),ball.Radius+2,Color.Yellow);
+					DefeatCircle = new Circle(new(loc.X, PlatformLocation.Y), ball.Radius + 2, Color.Yellow);
 					throw new GameException("Ты проиграл!");
 				}
 			}

@@ -11,9 +11,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphicLibrary", "GraphicLi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphicLibraryTests", "GraphicLibraryTests\GraphicLibraryTests.csproj", "{476E5A1C-F5D9-491B-ADF1-A35A9117ACF4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "geom_lab1", "geom_lab1\geom_lab1.csproj", "{3D54AC51-AA3F-41F3-9F41-A4016331FE5B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "geom_lab1", "geom_lab1\geom_lab1.csproj", "{3D54AC51-AA3F-41F3-9F41-A4016331FE5B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GamingLibrary", "GamingLibrary\GamingLibrary.csproj", "{58496EEA-C82A-4C72-B180-BC8072B02F6D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InteractiveLibrary", "GamingLibrary\InteractiveLibrary.csproj", "{58496EEA-C82A-4C72-B180-BC8072B02F6D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "geom_lab2", "geom_lab2\geom_lab2.csproj", "{4368A183-ED85-4D38-A971-693F45FB759F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "geom_lab3", "geom_lab3\geom_lab3.csproj", "{6E17A854-1880-48F4-AD4C-E14A58182A4A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastTestConsoleApp", "FastTestConsoleApp\FastTestConsoleApp.csproj", "{FF8C8681-0F19-48D6-84AB-8E3DA0744048}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +51,18 @@ Global
 		{58496EEA-C82A-4C72-B180-BC8072B02F6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58496EEA-C82A-4C72-B180-BC8072B02F6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58496EEA-C82A-4C72-B180-BC8072B02F6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4368A183-ED85-4D38-A971-693F45FB759F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4368A183-ED85-4D38-A971-693F45FB759F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4368A183-ED85-4D38-A971-693F45FB759F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4368A183-ED85-4D38-A971-693F45FB759F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E17A854-1880-48F4-AD4C-E14A58182A4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E17A854-1880-48F4-AD4C-E14A58182A4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E17A854-1880-48F4-AD4C-E14A58182A4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E17A854-1880-48F4-AD4C-E14A58182A4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF8C8681-0F19-48D6-84AB-8E3DA0744048}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF8C8681-0F19-48D6-84AB-8E3DA0744048}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF8C8681-0F19-48D6-84AB-8E3DA0744048}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF8C8681-0F19-48D6-84AB-8E3DA0744048}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
