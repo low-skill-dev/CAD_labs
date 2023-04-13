@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-namespace FastTestConsoleApp;
+namespace geom_lab3;
 public class Shader : IDisposable
 {
 	Stopwatch timer = new();
@@ -77,13 +79,14 @@ public class Shader : IDisposable
 		}
 	}
 
+	private float rC => Random.Shared.NextSingle() / 2 + 0.25f;
 	public void Use()
 	{
-		double timeValue = timer.Elapsed.TotalSeconds;
-		float greenValue = (float)Math.Sin(timeValue) / 2.0f + 0.5f;
-		int vertexColorLocation = GL.GetUniformLocation(Handle, "ourColor");
-		GL.Uniform4(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-
+		//double timeValue = timer.Elapsed.TotalSeconds;
+		//float greenValue = (float)Math.Sin(timeValue) / 2.0f + 0.5f;
+		//int vertexColorLocation = GL.GetUniformLocation(Handle, "ourColor");
+		//var color = new Vector4(rC, rC, rC, rC);
+		//GL.Uniform4(vertexColorLocation, color);
 		GL.UseProgram(Handle);
 	}
 

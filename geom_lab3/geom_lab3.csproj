@@ -8,7 +8,34 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="fragBlack.glsl" />
+    <None Remove="line.glsl" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="fragBlack.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="line.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="OpenTK" Version="4.7.7" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GraphicLibrary\GraphicLibrary.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<Content Include="vert.glsl">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="frag.glsl">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
 </Project>

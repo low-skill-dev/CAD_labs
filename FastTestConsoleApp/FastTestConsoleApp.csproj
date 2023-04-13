@@ -8,26 +8,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="frag_shader" />
-    <None Remove="vert_shader" />
+    <None Remove="frag.glsl" />
+    <None Remove="vert.glsl" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="vert_shader">
+    <Content Include="vert.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+		<Content Include="frag.glsl">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
   </ItemGroup>
 
 
 	<ItemGroup>
 		<PackageReference Include="OpenTK" Version="4.7.7" />
 	</ItemGroup>
-
-
-	<ItemGroup>
-	  <Content Include="frag_shader">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	</ItemGroup>
-
 </Project>

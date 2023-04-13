@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,13 +11,13 @@ using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace FastTestConsoleApp;
-public class Shader : IDisposable
+public class LineShader : IDisposable
 {
 	Stopwatch timer = new();
 
 	public int Handle;
 
-	public Shader(string vertexPath, string fragmentPath)
+	public LineShader(string vertexPath, string fragmentPath)
 	{
 		timer.Start();
 
@@ -70,7 +71,7 @@ public class Shader : IDisposable
 			GL.DeleteProgram(Handle);
 		}
 	}
-	~Shader()
+	~LineShader()
 	{
 		if(!IsDisposed) {
 			Console.WriteLine("GPU Resource leak! Did you forget to call Dispose()?");

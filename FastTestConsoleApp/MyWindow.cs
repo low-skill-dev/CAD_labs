@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
-
+using static System.MathF;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
@@ -13,21 +15,31 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 namespace FastTestConsoleApp;
 public class MyWindow : GameWindow
 {
-	float[] vertices = {
-		-0.5f, -0.5f, 0.0f, //Bottom-left vertex
-		 0.5f, -0.5f, 0.0f, //Bottom-right vertex
-		 0.0f,  0.5f, 0.0f  //Top vertex
+	private readonly float[] vertices =
+	  {
+		  // positions        // colors
+		  0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
+		 -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
+		  0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top 
+    };
+	uint[] indices = {  // note that we start from 0!
+		0, 1, 3,   // first triangle
+		1, 2, 3    // second triangle
 	};
 
 	int VertexBufferObject;
 	int VertexArrayObject;
+	int ElementBufferObject;
 	Shader Shader;
+
+	Stopwatch timer = new();
 
 
 	public MyWindow(int width, int height, string title = nameof(MyWindow))
 		: base(GameWindowSettings.Default, new() { Size = new(width, height), Title = title })
 	{
-		Shader = new Shader("vert_shader", "frag_shader");
+		timer.Start();
+		Shader = new Shader("vert.glsl", "frag.glsl");
 	}
 
 	protected override void OnKeyDown(KeyboardKeyEventArgs e)
@@ -54,21 +66,39 @@ public class MyWindow : GameWindow
 		var VAO = GL.GenVertexArray();
 		VertexArrayObject = VAO;
 		GL.BindVertexArray(VAO);
-		GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+
+		GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
 		GL.EnableVertexAttribArray(0);
+
+		GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
+		GL.EnableVertexAttribArray(1);
+
+
+		ElementBufferObject = GL.GenBuffer();
+		GL.BindBuffer(BufferTarget.ElementArrayBuffer, ElementBufferObject);
+		GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, BufferUsageHint.StaticDraw);
+
+
+		GL.GetInteger(GetPName.MaxVertexAttribs, out var nrAttributes);
+		Console.WriteLine("Maximum number of vertex attributes supported: " + nrAttributes);
+
 	}
 
 	protected override void OnRenderFrame(FrameEventArgs args)
 	{
 		base.OnRenderFrame(args);
 
-		var bytes = Random.Shared.NextSingle();
-		//GL.ClearColor(Random.Shared.NextSingle(), Random.Shared.NextSingle(), Random.Shared.NextSingle(), 1f);
 		GL.Clear(ClearBufferMask.ColorBufferBit);
-
 		Shader.Use();
+
+		var timeValue = (float)timer.Elapsed.TotalSeconds;
+		float greenValue = Abs(Sin(timeValue));
+		int vertexColorLocation = GL.GetUniformLocation(Shader.Handle, "ourColor");
+		GL.Uniform4(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
+
 		GL.BindVertexArray(VertexArrayObject);
-		GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
+		GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
 
 		SwapBuffers();
 	}

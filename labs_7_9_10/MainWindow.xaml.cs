@@ -40,6 +40,9 @@ public partial class MainWindow : Window
 	private List<PointF> _points = new();
 	private List<LineF> _lines = new();
 
+	public List<PointF> Points => _points;
+
+
 	private System.Windows.Point _center => new(ShowedImage.Width / 2, ShowedImage.Height / 2);
 
 	private LineF? _mirrorAxeLine;

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using static System.MathF;
 
 namespace GraphicLibrary.MathModels;
-public struct PointF : IEquatable<PointF>, IEquatable<System.Drawing.Point> ,IEquatable<System.Drawing.PointF>, IEquatable<System.Windows.Point>
+public struct PointF : IEquatable<PointF>, IEquatable<System.Drawing.Point>, IEquatable<System.Drawing.PointF>, IEquatable<System.Windows.Point>
 {
 	public float X, Y;
 
@@ -111,5 +111,10 @@ public struct PointF : IEquatable<PointF>, IEquatable<System.Drawing.Point> ,IEq
 			Round(this.X, 3) == other.X
 			&&
 			Round(this.Y, 3) == other.Y;
+	}
+
+	public PointF Clone()
+	{
+		return new(this.X, this.Y);
 	}
 }
