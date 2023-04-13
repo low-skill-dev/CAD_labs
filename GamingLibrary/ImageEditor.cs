@@ -66,7 +66,7 @@ public class ImageEditor : BitmapDrawer
 		 * то регистрируем попадание
 		 */
 
-		for(int i = 0; i < ControlledDots.Count; i++) {
+		for(int i = ControlledDots.Count - 1; i >= 0; i--) {
 			var curr = ControlledDots[i];
 
 			if(Common.GetCirleRadius(curr.Point, coordinates) <= DotRadius) {

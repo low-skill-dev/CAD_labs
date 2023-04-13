@@ -59,22 +59,15 @@ public class MyWindow : GameWindow
 
 	int VBO;
 	int VAO;
-	int EBO;
 	Shader shader;
-	Shader blackShader;
-	//[Obsolete]
-	//Shader lineShader;
 
 	public MyWindow(int width, int height, float[] vertices, string title = nameof(MyWindow))
 		: base(GameWindowSettings.Default, new() { Size = new(width, height), Title = title })
 	{
 		shader = new Shader("vert.glsl", "frag.glsl");
-		blackShader = new Shader("vert.glsl", "fragBlack.glsl");
-		//lineShader = new Shader("vert.glsl", "line.glsl");
 
 		this.vertices = vertices;
-		this.barycentrices = CalculateBarycentric(vertices.Length);
-		this.VertsAndBaries = ConcatVertsToBaries(vertices, barycentrices);
+		this.VertsAndBaries = ConcatVertsToBaries(vertices, CalculateBarycentric(vertices.Length));
 	}
 
 	protected override void OnLoad()
@@ -83,34 +76,24 @@ public class MyWindow : GameWindow
 
 		GL.ClearColor(System.Drawing.Color.White);
 
-		VBO = GL.GenBuffer();
+		this.VBO = GL.GenBuffer();
 		GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
 		GL.BufferData(BufferTarget.ArrayBuffer, VertsAndBaries.Length * sizeof(float), VertsAndBaries, BufferUsageHint.StaticDraw);
 
 		this.VAO = GL.GenVertexArray();
 		GL.BindVertexArray(VAO);
 
-		// 3 points and 3 barycentrices = stride is 6
+		// 3 points and 3 barycentrices = stride is 6 * sizeof(float)
 		GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
 		GL.EnableVertexAttribArray(0);
 
 		GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
 		GL.EnableVertexAttribArray(1);
 
-
-
-
-		var rotationX = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(xRotationD));
-		var rotationY = Matrix4.CreateRotationY(MathHelper.DegreesToRadians(yRotationD));
-		var rotationZ = Matrix4.CreateRotationZ(MathHelper.DegreesToRadians(zRotationD));
-
-		var rotation = rotationY * rotationX * rotationZ;
-		GL.UniformMatrix4(GL.GetUniformLocation(blackShader.Handle, "rotation"), true, ref rotation);
-		GL.UniformMatrix4(GL.GetUniformLocation(shader.Handle, "rotation"), true, ref rotation);
-
-		var scaleM = Matrix4.CreateScale(scale);
-		GL.UniformMatrix4(GL.GetUniformLocation(blackShader.Handle, "scale"), true, ref scaleM);
-		GL.UniformMatrix4(GL.GetUniformLocation(shader.Handle, "scale"), true, ref scaleM);
+		GL.Enable(EnableCap.CullFace);
+		GL.CullFace(CullFaceMode.Back);
+		//GL.Enable(EnableCap.LineSmooth);
+		//GL.Enable(EnableCap.Blend);
 	}
 
 	protected override void OnRenderFrame(FrameEventArgs args)
@@ -119,15 +102,25 @@ public class MyWindow : GameWindow
 
 		GL.Clear(ClearBufferMask.ColorBufferBit);
 
-		if(borderMode) {
-			blackShader.Use();
-			GL.DrawArrays(PrimitiveType.Lines, 0, vertices.Length);
-		} else {
-			shader.Use();
-			GL.DrawArrays(PrimitiveType.Triangles, 0, vertices.Length);
-		}
+		shader.Use();
+
+		GL.DrawArrays(borderMode ? PrimitiveType.Lines : PrimitiveType.Triangles, 0, VertsAndBaries.Length);
 
 		SwapBuffers();
+	}
+
+
+	private Matrix4 CreateTranslation()
+	{
+		var rotationX = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(xRotationD));
+		var rotationY = Matrix4.CreateRotationY(MathHelper.DegreesToRadians(yRotationD));
+		var rotationZ = Matrix4.CreateRotationZ(MathHelper.DegreesToRadians(zRotationD));
+
+		var rotation = rotationY * rotationX * rotationZ;
+
+		var scale = Matrix4.CreateScale(this.scale);
+
+		return rotation * scale;
 	}
 
 	protected override void OnKeyDown(KeyboardKeyEventArgs e)
@@ -140,23 +133,17 @@ public class MyWindow : GameWindow
 
 		if(e.Key == Keys.X || e.Key == Keys.Y || e.Key == Keys.Z) {
 			if(e.Key == Keys.X) {
-				xRotationD += 15f;
+				xRotationD += e.Modifiers == KeyModifiers.Alt ? -15f : 15f;
 			}
 			if(e.Key == Keys.Y) {
-				yRotationD += 15f;
+				yRotationD += e.Modifiers == KeyModifiers.Alt ? -15f : 15f;
 			}
 			if(e.Key == Keys.Z) {
-				zRotationD += 15f;
+				zRotationD += e.Modifiers == KeyModifiers.Alt ? -15f : 15f;
 			}
 
-
-			var rotationX = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(xRotationD));
-			var rotationY = Matrix4.CreateRotationY(MathHelper.DegreesToRadians(yRotationD));
-			var rotationZ = Matrix4.CreateRotationZ(MathHelper.DegreesToRadians(zRotationD));
-
-			var rotation = rotationY * rotationX * rotationZ;
-			GL.UniformMatrix4(GL.GetUniformLocation(blackShader.Handle, "rotation"), true, ref rotation);
-			GL.UniformMatrix4(GL.GetUniformLocation(shader.Handle, "rotation"), true, ref rotation);
+			var transl = CreateTranslation();
+			GL.UniformMatrix4(GL.GetUniformLocation(shader.Handle, "translate"), false, ref transl);
 		}
 
 		if(e.Key == Keys.Equal || e.Key == Keys.Minus) {
@@ -164,18 +151,17 @@ public class MyWindow : GameWindow
 				scale += 0.1f;
 			}
 			if(e.Key == Keys.Minus) {
-				if(scale>0.1)
+				if(scale > 0.1)
 					scale -= 0.09f;
 			}
 
-			var scaleM = Matrix4.CreateScale(scale);
-			GL.UniformMatrix4(GL.GetUniformLocation(blackShader.Handle, "scale"), true, ref scaleM);
-			GL.UniformMatrix4(GL.GetUniformLocation(shader.Handle, "scale"), true, ref scaleM);
+			var transl = CreateTranslation();
+			GL.UniformMatrix4(GL.GetUniformLocation(shader.Handle, "translate"), false, ref transl);
 		}
-
 
 		if(e.Key == Keys.B) {
 			borderMode = !borderMode;
+			GL.Uniform1(GL.GetUniformLocation(shader.Handle, "allBlack"), borderMode ? 1 : 0);
 		}
 	}
 
@@ -190,8 +176,6 @@ public class MyWindow : GameWindow
 	{
 		base.OnUnload();
 
-		shader?.Dispose();
-		blackShader?.Dispose();
-		//lineShader?.Dispose();
+		shader.Dispose();
 	}
 }

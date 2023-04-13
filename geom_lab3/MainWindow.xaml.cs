@@ -277,8 +277,9 @@ public partial class MainWindow : Window
 			RotatePerStepTB.Background = new SolidColorBrush(Color.FromArgb(clr.A, clr.R, clr.G, clr.B));
 			return;
 		}
+		float stepR = stepD * float.Pi / 180;
 
-		var points = _points.Select(x => x.Clone()).ToArray();
+		var points = _points.ToArray();
 
 		/* Проведем мысленное моделирование. Возьмем нашу фигуру. 
 		 * Положим её на плоскость XY таким образом, что линия, соединяющая её начальную и конечную точки
@@ -310,20 +311,6 @@ public partial class MainWindow : Window
 		 */
 		var points3 = points.Select(p => new Vector3(p.X, p.Y, 0f)).ToArray();
 
-		/* Теперь имеет каждую точку, у которой Х - константа, YZ - плоскость вращения.
-		 * Будем вращать! Ось вращения - начало координат.
-		 */
-		float stepR = stepD * float.Pi / 180;
-		List<Vector3[]> resultingCopies = new((int)Ceiling(2 * PI / stepR));
-		var start = new PointF(0f, 0f);
-		for(float angleR = 0; angleR <= 2 * PI; angleR += stepR) {
-			resultingCopies.Add(points3.Select(p => {
-				var pointYZ = Common.RotatePoint(new PointF(p.Y, p.Z), start, angleR);
-				return new Vector3(p.X, pointYZ.X, pointYZ.Y);
-			}).ToArray());
-		} // после данного цикла имеет полный набор точек в трехмерном пространстве
-
-
 		/* Но дело в том, что сама по-себе фигура нам не интересна - нам нужна её поверхность.
 		 * Для этог оследует соединять точки копий между собой.
 		 * 
@@ -335,33 +322,45 @@ public partial class MainWindow : Window
 		 */
 
 		List<Vector3> resultingConnected = new((int)Ceiling(points3.Length * 2 * (2 * PI / stepR)));
-		for(float angleR = 0; angleR < 2 * PI; angleR += stepR) {
-			// нужно 4-х угольник для каждой пары точек
-			var current = points3;
-			for(int i = 0; i < current.Length; i++) {
-				// треугольник 4-х угольника 1
-				resultingConnected.Add(RotateYZ(current.At(i), angleR));
-				resultingConnected.Add(RotateYZ(current.At(i + 1), angleR));
-				resultingConnected.Add(RotateYZ(current.At(i), angleR + stepR));
+		int debug1 = 0;
+		int debug2 = 0;
 
-				// треугольник 4-х угольника 2
-				resultingConnected.Add(RotateYZ(current.At(i+1), angleR));
-				resultingConnected.Add(RotateYZ(current.At(i), angleR + stepR));
-				resultingConnected.Add(RotateYZ(current.At(i+1), angleR + stepR));
+		float angleR; int i;
+		for(angleR = 0; angleR <= 2 * PI; angleR += stepR) {
+			debug1++;
+			debug2 = 0;
+			// создаваемая поверхность представляет 4-х угольник, т.е. 2 треугольника
+			var current = points3;
+			for(i = 0; i < current.Length-1; i++) { // -1 т.к. первую и последнюю не соединяем - они лежат но оси!
+				debug2++;
+				// 1-й треугольник 4-х угольника
+				var p1 = RotateYZ(current.At(i), angleR);
+				var p2 = RotateYZ(current.At(i + 1), angleR);
+				var p3 = RotateYZ(current.At(i + 1), angleR + stepR);
+
+				resultingConnected.Add(p1);
+				resultingConnected.Add(p2);
+				resultingConnected.Add(p3);
+
+				// 2-й треугольник 4-х угольника
+				var p4 = RotateYZ(current.At(i), angleR + stepR);
+
+				if(p1.Equals(p4)) { // одна из точек лежит на оси (первый и последний треуг)
+					continue;
+				}
+
+				resultingConnected.Add(p1);
+				resultingConnected.Add(p3);
+				resultingConnected.Add(p4);
 			}
 		}
 
 		/* Нормализуем значения
 		 * OpenGL оперирует в пространстве от -1 до 1
 		 */
-		var flat = resultingCopies.SelectMany(x => x); ;
-		var maxX = Abs(flat.Max(x => Abs(x.X)));
-		var maxY = Abs(flat.Max(x => Abs(x.Y)));
-		var maxZ = Abs(flat.Max(x => Abs(x.Y)));
-
-		var result = flat.Select(x => new Vector3(x.X / maxX, x.Y / maxY, x.Z / maxZ)).SelectMany(x => new float[] { x.X, x.Y, x.Z }).ToArray();
-
-		var t = result.Distinct().ToArray();
+		var maxX = Abs(resultingConnected.Max(x => Abs(x.X)));
+		var maxY = Abs(resultingConnected.Max(x => Abs(x.Y)));
+		var maxZ = Abs(resultingConnected.Max(x => Abs(x.Z)));
 
 		var resultNew = resultingConnected.Select(x => new Vector3(x.X / maxX, x.Y / maxY, x.Z / maxZ)).SelectMany(x => new float[] { x.X, x.Y, x.Z }).ToArray();
 

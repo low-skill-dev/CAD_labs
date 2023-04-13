@@ -9,7 +9,7 @@
 	<Grid>
 		<StackPanel Orientation="Horizontal" Width="1200">
 			<StackPanel Orientation="Vertical" Width="290" Margin="5">
-				<Button Name="ClearPointsBT">Очистить</Button>
+				<Button Name="ClearPointsBT" Click="ClearPointsBT_Click">Очистить</Button>
 				<StackPanel Orientation="Horizontal">
 					<Label Margin="64,0,0,0" HorizontalAlignment="Right">X</Label>
 					<Label Margin="128,0,0,0">Y</Label>

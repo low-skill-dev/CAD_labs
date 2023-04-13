@@ -2,8 +2,7 @@
 layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec3 aBarycentric;
 
-uniform mat4 rotation;
-uniform mat4 scale;
+uniform mat4 translate;
 
 out vec3 vbc;
 
@@ -12,5 +11,5 @@ void main()
 {
     vbc = aBarycentric;
 
-    gl_Position = vec4(aPosition, 1.0) * rotation * scale;
+    gl_Position = vec4(aPosition, 1) * translate;
 }
