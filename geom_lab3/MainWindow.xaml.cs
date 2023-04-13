@@ -339,7 +339,7 @@ public partial class MainWindow : Window
 			// нужно 4-х угольник для каждой пары точек
 			var current = points3;
 			for(int i = 0; i < current.Length; i++) {
-				// треугольник 4-х угольника 2
+				// треугольник 4-х угольника 1
 				resultingConnected.Add(RotateYZ(current.At(i), angleR));
 				resultingConnected.Add(RotateYZ(current.At(i + 1), angleR));
 				resultingConnected.Add(RotateYZ(current.At(i), angleR + stepR));

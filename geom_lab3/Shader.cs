@@ -39,10 +39,10 @@ public class Shader : IDisposable
 				GL.GetShaderInfoLog(vertexShader));
 		}
 
-		GL.GetShader(vertexShader, ShaderParameter.CompileStatus, out success);
+		GL.GetShader(fragmentShader, ShaderParameter.CompileStatus, out success);
 		if(success == 0) {
 			Console.WriteLine(
-				GL.GetShaderInfoLog(vertexShader));
+				GL.GetShaderInfoLog(fragmentShader));
 		}
 
 		Handle = GL.CreateProgram();

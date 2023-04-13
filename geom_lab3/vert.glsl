@@ -1,14 +1,16 @@
 ﻿#version 430 core
 layout (location = 0) in vec3 aPosition;
-attribute vec3 barycentric;
+layout (location = 1) in vec3 aBarycentric;
 
 uniform mat4 rotation;
+uniform mat4 scale;
 
-out vec3 bcCoords;
+out vec3 vbc;
 
 
 void main()
 {
-    bcCoords = barycentric;
-    gl_Position = vec4(aPosition, 1.0) * rotation;
+    vbc = aBarycentric;
+
+    gl_Position = vec4(aPosition, 1.0) * rotation * scale;
 }
