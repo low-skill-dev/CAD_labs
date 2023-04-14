@@ -56,7 +56,7 @@ public partial class MainWindow : Window
 		_drawer = new((int)this.ShowedImage.Width, (int)this.ShowedImage.Height);
 
 		_drawer.RenderFrame();
-		this.ShowedImage.Source = Common.BitmapToImageSource(_drawer.CurrentFrame);
+		this.ShowedImage.Source = Common.BitmapToImageSource(_drawer.CurrentFrame.Bitmap);
 
 		StepSelector_PreviewMouseUp(null!, null!);
 		DebugOut.Text = $"Ожидание первой точки.";

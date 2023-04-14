@@ -21,7 +21,7 @@ public class ImageEditor : BitmapDrawer
 {
 	private IEnumerator<bool> pattern;
 
-	public float DotRadius { get; set; } = 5;
+	public float DotRadius { get; set; } = 5*2;
 	public Color DotColor { get; set; } = Color.Yellow;
 	public Color SelectedDotColor { get; set; } = Color.White;
 

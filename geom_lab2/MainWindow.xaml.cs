@@ -70,6 +70,7 @@ public partial class MainWindow : Window
 			imageEditor.ControlledDots[selectedPointId] = new(pos, false);
 			currentState = States.NoPointSelected;
 			selectedPointId = -1;
+			GC.Collect(GC.MaxGeneration,GCCollectionMode.Aggressive,true,true);
 		}
 
 		SetDotsCollection(imageEditor.ControlledDots.Select(x => x.Point), selectedPointId);
@@ -77,6 +78,7 @@ public partial class MainWindow : Window
 		this.GameImage.Source = imageEditor.CurrentFrameImage;
 	}
 
+	private DateTime LastMoved = DateTime.UtcNow;
 	private void GameImage_MouseMove(object sender, MouseEventArgs e)
 	{
 		if(currentState == States.NoPointSelected) return;
@@ -84,10 +86,13 @@ public partial class MainWindow : Window
 		var pos = (PointF)e.GetPosition((Image)sender);
 		if(currentState == States.PointSelected) {
 			imageEditor.ControlledDots[selectedPointId] = new(pos, true);
-		}
 
-		imageEditor.RenderCurrentState();
-		this.GameImage.Source = imageEditor.CurrentFrameImage;
+			var dtms = (DateTime.UtcNow- LastMoved).TotalMilliseconds;
+
+			if(dtms>300)
+				imageEditor.RenderCurrentState();
+				this.GameImage.Source = imageEditor.CurrentFrameImage;
+		}
 	}
 
 	private void SetDotsCollection(IEnumerable<PointF> points, int selectedId = -1)
@@ -109,8 +114,6 @@ public partial class MainWindow : Window
 			DisplayedDotsSP.Children.Add(wrapper);
 			count++;
 		}
-
-		GC.Collect();
 	}
 
 	private void ClearPointsBT_Click(object sender, RoutedEventArgs e)

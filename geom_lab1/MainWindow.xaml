@@ -27,6 +27,12 @@
 					</Label>
 					<TextBox FontSize="16" Name="BallAccelerationTB" Width="100"></TextBox>
 				</StackPanel>
+				<StackPanel Orientation="Horizontal">
+					<Label FontSize="16" Width="200">
+						Число шаров
+					</Label>
+					<TextBox FontSize="16" Name="NumofBallsTB" Width="100"></TextBox>
+				</StackPanel>
 				<Button Click="StartNewGameBT_Click" Name="StartNewGameBT" FontSize="16">Начать новую игру</Button>
 				<TextBox IsReadOnly="True" Name="Player_message" Foreground="Red" FontWeight="Bold" FontSize="12"></TextBox>
 			</StackPanel>

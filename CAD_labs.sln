@@ -17,9 +17,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InteractiveLibrary", "Gamin
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "geom_lab2", "geom_lab2\geom_lab2.csproj", "{4368A183-ED85-4D38-A971-693F45FB759F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "geom_lab3", "geom_lab3\geom_lab3.csproj", "{6E17A854-1880-48F4-AD4C-E14A58182A4A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "geom_lab3", "geom_lab3\geom_lab3.csproj", "{6E17A854-1880-48F4-AD4C-E14A58182A4A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastTestConsoleApp", "FastTestConsoleApp\FastTestConsoleApp.csproj", "{FF8C8681-0F19-48D6-84AB-8E3DA0744048}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FastTestConsoleApp", "FastTestConsoleApp\FastTestConsoleApp.csproj", "{FF8C8681-0F19-48D6-84AB-8E3DA0744048}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "coursework", "coursework\coursework.csproj", "{57FDBDC5-6D23-45A9-8DB6-3C0E928F727F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{FF8C8681-0F19-48D6-84AB-8E3DA0744048}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF8C8681-0F19-48D6-84AB-8E3DA0744048}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF8C8681-0F19-48D6-84AB-8E3DA0744048}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57FDBDC5-6D23-45A9-8DB6-3C0E928F727F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57FDBDC5-6D23-45A9-8DB6-3C0E928F727F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57FDBDC5-6D23-45A9-8DB6-3C0E928F727F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57FDBDC5-6D23-45A9-8DB6-3C0E928F727F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

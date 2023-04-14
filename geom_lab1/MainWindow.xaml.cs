@@ -50,10 +50,16 @@ public partial class MainWindow : Window
 			BallAccel = 100;
 			this.BallAccelerationTB.Text = BallAccel.ToString("0.00");
 		}
+
+		int ballsCount = 10;
+		try {
+			ballsCount = int.Parse(NumofBallsTB.Text);
+		} catch { }
+
 		var parsed = int.TryParse(BallAccelerationTB.Text, out int accel);
-		gameRender = new((int)GameImage.Width, (int)GameImage.Height, 100, ballAcceleration: parsed ? accel : BallAccel) {
+		gameRender = new((int)GameImage.Width, (int)GameImage.Height, ballsCount, ballAcceleration: parsed ? accel : BallAccel, ballBorderColor: System.Drawing.Color.Yellow) {
 			DisableBallFilling = disableBallFilling,
-			UseRandomColors = true
+			UseRandomColors = false
 		};
 
 

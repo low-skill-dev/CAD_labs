@@ -18,9 +18,9 @@ public class BitmapDrawer
 	protected int FrameWidth { get; set; }
 	protected int FrameHeight { get; set; }
 
-	private FastBitmap? CurrentFastLock { get; set; }
-	public Bitmap CurrentFrame { get; private set; }
-	public BitmapImage CurrentFrameImage => Common.BitmapToImageSource(CurrentFrame);
+	//private FastBitmap? CurrentFastLock { get; set; }
+	public DirectBitmap CurrentFrame { get; init; }
+	public BitmapImage CurrentFrameImage => Common.BitmapToImageSource(CurrentFrame.Bitmap);
 
 	public List<Dot> Dots { get; private set; } = new();
 	public List<Line> Lines { get; private set; } = new();
@@ -38,7 +38,7 @@ public class BitmapDrawer
 	{
 		this.FrameWidth = frameWidth;
 		this.FrameHeight = frameHeight;
-		this.CurrentFrame = new Bitmap(frameWidth, frameHeight);
+		this.CurrentFrame = new(frameWidth, frameHeight);
 	}
 
 	#region public
@@ -52,15 +52,15 @@ public class BitmapDrawer
 		this.InterpolatedPoints.Clear();
 		this.LagrangePolys.Clear();
 		this.Besie2Polys.Clear();
-		this.CurrentFrame = new Bitmap(FrameWidth, FrameHeight);
+		this.CurrentFrame.Clear(Color.FromArgb(0, 0, 0, 0));
 	}
 
 	public void RenderFrame(bool noClear = false)
 	{
-		using var currentFastLock = this.CurrentFrame.FastLock();
-		this.CurrentFastLock = currentFastLock;
+		//using var currentFastLock = this.CurrentFrame.FastLock();
+		//this.CurrentFastLock = currentFastLock;
 
-		if(!noClear) this.CurrentFastLock.Clear(Color.FromArgb(0, 0, 0, 0));
+		if(!noClear) this.CurrentFrame.Clear(Color.FromArgb(0, 0, 0, 0));
 
 		this.Dots.ForEach(DrawDot);
 		this.Lines.ForEach(DrawLine);
@@ -88,7 +88,7 @@ public class BitmapDrawer
 			if(obj is Circle) this.DrawCircle((Circle)obj);
 		}
 
-		this.CurrentFastLock = null;
+		//this.CurrentFastLock = null;
 	}
 
 	#region no-render methods
@@ -249,7 +249,8 @@ public class BitmapDrawer
 		if(isValidPoint(point)) {
 			patternResolver.MoveNext();
 			if(patternResolver.Current)
-				this.CurrentFastLock!.SetPixel((int)Round(point.X), (int)Round(point.Y), color);
+				//this.CurrentFastLock!.SetPixel((int)Round(point.X), (int)Round(point.Y), color);
+				this.CurrentFrame.SetPixel((int)Round(point.X), (int)Round(point.Y), color);
 		}
 	}
 	#endregion
@@ -319,7 +320,7 @@ public class BitmapDrawer
 			for(int dx = -1; dx < 2; dx += 2) {
 				Point target = new(point.X + dx, point.Y);
 				if(isValidPoint(target)) {
-					if(CurrentFastLock!.GetPixel(target.X, target.Y).Equals(baseColor)) {
+					if(CurrentFrame.GetPixel(target.X, target.Y).Equals(baseColor)) {
 						points.Push(target);
 					}
 				}
@@ -327,7 +328,7 @@ public class BitmapDrawer
 			for(int dy = -1; dy < 2; dy += 2) {
 				Point target = new(point.X, point.Y + dy);
 				if(isValidPoint(target)) {
-					if(CurrentFastLock!.GetPixel(target.X, target.Y).Equals(baseColor)) {
+					if(CurrentFrame.GetPixel(target.X, target.Y).Equals(baseColor)) {
 						points.Push(target);
 					}
 				}

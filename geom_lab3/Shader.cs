@@ -14,14 +14,10 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 namespace geom_lab3;
 public class Shader : IDisposable
 {
-	Stopwatch timer = new();
-
 	public int Handle;
 
 	public Shader(string vertexPath, string fragmentPath)
 	{
-		timer.Start();
-
 		var vertexShader = GL.CreateShader(ShaderType.VertexShader);
 		var vertexShaderSrc = File.ReadAllText(vertexPath);
 		GL.ShaderSource(vertexShader, vertexShaderSrc);
@@ -82,11 +78,6 @@ public class Shader : IDisposable
 	private float rC => Random.Shared.NextSingle() / 2 + 0.25f;
 	public void Use()
 	{
-		//double timeValue = timer.Elapsed.TotalSeconds;
-		//float greenValue = (float)Math.Sin(timeValue) / 2.0f + 0.5f;
-		//int vertexColorLocation = GL.GetUniformLocation(Handle, "ourColor");
-		//var color = new Vector4(rC, rC, rC, rC);
-		//GL.Uniform4(vertexColorLocation, color);
 		GL.UseProgram(Handle);
 	}
 

@@ -385,9 +385,6 @@ public class CommonTests
 
 		Assert.Equal(Round2(expected), Round2(actual));
 	}
-
-
-	// TODO: Написать кейс для ситуаций вне центра (это фейлится в реале)
 	#endregion
 
 	#region Besie Points
