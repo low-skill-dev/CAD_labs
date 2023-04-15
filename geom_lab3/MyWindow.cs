@@ -54,6 +54,7 @@ public class MyWindow : GameWindow
 	private float zRotationD = 0;
 	private float scale = 1;
 	private bool borderMode = false;
+	private bool useGrayPolys = false;
 
 	private readonly float[] VertsAndBaries;
 
@@ -97,6 +98,11 @@ public class MyWindow : GameWindow
 
 	private void SetAllUniforms()
 	{
+		/* uniform int allBlack;
+		 * uniform int grayPolygons;
+		 * uniform mat4 rotate;
+		 * uniform mat4 scale;
+		 */
 		var rotationX = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(xRotationD));
 		var rotationY = Matrix4.CreateRotationY(MathHelper.DegreesToRadians(yRotationD));
 		var rotationZ = Matrix4.CreateRotationZ(MathHelper.DegreesToRadians(zRotationD));
@@ -107,6 +113,7 @@ public class MyWindow : GameWindow
 		GL.UniformMatrix4(GL.GetUniformLocation(shader.Handle, "rotate"), false, ref rotation);
 		GL.UniformMatrix4(GL.GetUniformLocation(shader.Handle, "scale"), false, ref scale);
 		GL.Uniform1(GL.GetUniformLocation(shader.Handle, "allBlack"), borderMode ? 1 : 0);
+		GL.Uniform1(GL.GetUniformLocation(shader.Handle, "grayPolygons"), useGrayPolys ? 1 : 0);
 	}
 
 	protected override void OnRenderFrame(FrameEventArgs args)
@@ -116,7 +123,7 @@ public class MyWindow : GameWindow
 		GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
 		shader.Use();
-		GL.DrawArrays(borderMode ? PrimitiveType.Lines : PrimitiveType.Triangles, 0, VertsAndBaries.Length);
+		GL.DrawArrays(borderMode ? PrimitiveType.LineLoop : PrimitiveType.Triangles, 0, VertsAndBaries.Length);
 
 		SwapBuffers();
 	}
@@ -153,6 +160,10 @@ public class MyWindow : GameWindow
 
 		if(e.Key == Keys.B) {
 			borderMode = !borderMode;
+		}
+
+		if(e.Key == Keys.G) {
+			useGrayPolys = !useGrayPolys;
 		}
 
 		this.SetAllUniforms();

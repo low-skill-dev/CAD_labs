@@ -256,83 +256,68 @@ public partial class MainWindow : Window
 		ShowedImage.Source = _drawer.CurrentFrameImage;
 	}
 
+
+	private SolidColorBrush redBrush => new SolidColorBrush(Color.FromArgb(
+		 System.Drawing.Color.LightCoral.A, 
+		 System.Drawing.Color.LightCoral.R, 
+		 System.Drawing.Color.LightCoral.G, 
+		 System.Drawing.Color.LightCoral.B));
+	private SolidColorBrush greenBrush => new SolidColorBrush(Color.FromArgb(
+		 System.Drawing.Color.LightCoral.A,
+		 System.Drawing.Color.LightCoral.R,
+		 System.Drawing.Color.LightCoral.G,
+		 System.Drawing.Color.LightCoral.B));
 	private void CreateOpenGlBT_Click(object sender, RoutedEventArgs e)
 	{
-		if(string.IsNullOrWhiteSpace(RotatePerStepTB.Text)) {
+		if(string.IsNullOrWhiteSpace(RotatePerStepTB.Text))
 			RotatePerStepTB.Text = "90";
-		}
-
-		if(_currentState == States.WaitingNextPoint) {
+		if(_currentState == States.WaitingNextPoint)
 			LoopButton_Click(null!, null!);
-		}
 
 		float stepD = 0;
 		try {
-			stepD = float.Parse(RotatePerStepTB.Text);
-			var clr = System.Drawing.Color.LightGreen;
-			RotatePerStepTB.Background = new SolidColorBrush(Color.FromArgb(clr.A, clr.R, clr.G, clr.B));
-			stepD = stepD % 360;
+			stepD = float.Parse(RotatePerStepTB.Text) % 360;
+			RotatePerStepTB.Background = greenBrush;
 		} catch {
-			var clr = System.Drawing.Color.LightCoral;
-			RotatePerStepTB.Background = new SolidColorBrush(Color.FromArgb(clr.A, clr.R, clr.G, clr.B));
+			RotatePerStepTB.Background = redBrush;
 			return;
 		}
 		float stepR = stepD * float.Pi / 180;
-
 		var points = _points.ToArray();
 
-		/* Проведем мысленное моделирование. Возьмем нашу фигуру. 
-		 * Положим её на плоскость XY таким образом, что линия, соединяющая её начальную и конечную точки
-		 * совпадает с осью X. Этого можно добиться вращением исходной фигуры в двухмерной плоскости.
-		 *
-		 * Тогда, вращение каждой точки вокруг оси Х будет представлять собой уравнение окружности, радиус
-		 * в котором равен координате Y исходной точки.
-		 * Тогда каждую точку сможет представить в плоскости YZ, где начальная координата Y=Y, Z=0.
+		/* Проведем мысленное моделирование. Возьмем нашу фигуру. Положим её на плоскость XY таким образом, 
+		 * что линия, соединяющая её начальную и конечную точки совпадает с осью X. Этого можно добиться 
+		 * вращением исходной фигуры в двухмерной плоскости. Тогда, вращение каждой точки вокруг оси Х будет 
+		 * представлять собой уравнение окружности, радиус в котором равен координате Y исходной точки.
+		 * Тогда, каждую точку сможем представить в плоскости YZ, где начальная координата Y=Y, Z=0.
 		 */
-		var first = points.At(0);
-		var last = points.At(-1);
-		var (k, b) = Common.FindLinearEquation(new(first, last)); // получим ось
+		var first = points.At(0); var last = points.At(-1);
 
-
-		/* Сначала положим первую точку на ось Х.
-		 * Заодно сдвинем её в начало координат для упрощения.
+		/* Сначала положим первую точку на ось Х. Заодно сдвинем её в начало координат для упрощения.
 		 * Потом довернем все остальные точки.
 		 */
-		var delta = new PointF(first.X, first.Y);
-		points = points.Select(p => p - delta).ToArray();
-		first = points.At(0);
-		last = points.At(-1);
-
+		var dXY = new PointF(first.X, first.Y);
+		points = points.Select(p => p - dXY).ToArray();
+		first = points.At(0); last = points.At(-1);
 		var dA = -1 * Common.FindAngleOfPointOnCircle(first, last);
 		points = points.Select(p => Common.RotatePoint(p, first, dA)).ToArray();
 
-
-		/* Перейдем в трехмерное пространство
-		 */
+		// Перейдем в трехмерное пространство
 		var points3 = points.Select(p => new Vector3(p.X, p.Y, 0f)).ToArray();
 
-		/* Но дело в том, что сама по-себе фигура нам не интересна - нам нужна её поверхность.
-		 * Для этог оследует соединять точки копий между собой.
-		 * 
-		 * Для этого необходимо соединять предыдущую точку с настоящей.
-		 * Проведем следующее преобразование.
-		 * 
-		 * Имеем каждую точку, у которой Х - константа, YZ - плоскость вращения.
-		 * Будем вращать! Ось вращения - начало координат.
+		/* Cама по-себе фигура нам не интересна - нам нужна её поверхность. Для этого следует соединять точки 
+		 * копий фигуры между собой. Если пронумеровать последовательные точки плоской фигуры как 0, 1, 2...N, а
+		 * функцию вращения точки на stepR обозначения за R то построение поверхности между ними будет выглядеть
+		 * как построение двух треугольников в 3-х мерном пространстве, выраженных следующими координатами
+		 * вершин: 0 -> 1 -> R(1) и R(0) -> R(1) -> 1. Очевидно, что если мы имеем случай, где точка 0 или 1 лежит 
+		 * на оси Х, то второй треугольник не нужен - он будет дублировать первый. Имеем каждую точку, 
+		 * у которой Х - константа, YZ - плоскость вращения. Будем вращать! Ось вращения - начало координат.
 		 */
-
 		List<Vector3> resultingConnected = new((int)Ceiling(points3.Length * 2 * (2 * PI / stepR)));
-		int debug1 = 0;
-		int debug2 = 0;
-
-		float angleR; int i;
-		for(angleR = 0; angleR <= 2 * PI; angleR += stepR) {
-			debug1++;
-			debug2 = 0;
+		for(float angleR = 0; angleR < 2 * PI; angleR += stepR) {
 			// создаваемая поверхность представляет 4-х угольник, т.е. 2 треугольника
 			var current = points3;
-			for(i = 0; i < current.Length-1; i++) { // -1 т.к. первую и последнюю не соединяем - они лежат но оси!
-				debug2++;
+			for(int i = 0; i < current.Length-1; i++) { // -1 т.к. первую и последнюю не соединяем - они лежат но оси!
 				// 1-й треугольник 4-х угольника
 				var p1 = RotateYZ(current.At(i), angleR);
 				var p2 = RotateYZ(current.At(i + 1), angleR);
@@ -345,26 +330,20 @@ public partial class MainWindow : Window
 				// 2-й треугольник 4-х угольника
 				var p4 = RotateYZ(current.At(i), angleR + stepR);
 
-				if(p1.Equals(p4)) { // одна из точек лежит на оси (первый и последний треуг)
-					continue;
-				}
+				if(p1.Equals(p4)) continue;  // одна из точек лежит на оси (первый и последний треуг)		
 
 				resultingConnected.Add(p1);
 				resultingConnected.Add(p3);
 				resultingConnected.Add(p4);
-			}
-		}
+		} }
 
-		/* Нормализуем значения
-		 * OpenGL оперирует в пространстве от -1 до 1
-		 */
+		// Нормализуем значения - OpenGL оперирует в пространстве от -1 до 1
 		var maxX = Abs(resultingConnected.Max(x => Abs(x.X)));
 		var maxY = Abs(resultingConnected.Max(x => Abs(x.Y)));
 		var maxZ = Abs(resultingConnected.Max(x => Abs(x.Z)));
+		var result = resultingConnected.Select(x => new Vector3(x.X / maxX, x.Y / maxY, x.Z / maxZ)).SelectMany(x => new float[] { x.X, x.Y, x.Z }).ToArray();
 
-		var resultNew = resultingConnected.Select(x => new Vector3(x.X / maxX, x.Y / maxY, x.Z / maxZ)).SelectMany(x => new float[] { x.X, x.Y, x.Z }).ToArray();
-
-		MyWindow objWin = new(1700, 680, resultNew);
+		var objWin = new MyWindow(1700, 680, result);
 		objWin.Run();
 	}
 

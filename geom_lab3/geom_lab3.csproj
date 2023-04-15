@@ -8,20 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="fragBlack.glsl" />
-    <None Remove="line.glsl" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="fragBlack.glsl">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="line.glsl">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="OpenTK" Version="4.7.7" />
   </ItemGroup>
 
