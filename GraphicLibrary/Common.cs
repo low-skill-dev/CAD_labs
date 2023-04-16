@@ -9,10 +9,12 @@ using static System.MathF;
 using System.Security.Cryptography.X509Certificates;
 using GraphicLibrary.MathModels;
 using PointF = GraphicLibrary.MathModels.PointF;
+using System.Windows.Media;
+using System.Drawing.Imaging;
 
 namespace GraphicLibrary;
 
-public class Common
+public static class Common
 {
 	// https://stackoverflow.com/a/22501616/11325184
 	public static BitmapImage BitmapToImageSource(Bitmap bitmap)
@@ -25,14 +27,9 @@ public class Common
 			bitmapimage.StreamSource = memory;
 			bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
 			bitmapimage.EndInit();
-
+			
 			return bitmapimage;
 		}
-	}
-
-	public PointF PointsAverage(PointF first, PointF second)
-	{
-		return (first + second) / 2;
 	}
 
 	// System.Windows.Point -> System.Drawing.PointF
@@ -226,70 +223,48 @@ public class Common
 		return Abs(sum) / 2;
 	}
 
-
-
-	// ru.wikipedia.org/wiki/Интерполяционный_многочлен_Лагранжа
-	//private static float LagrangeFind(IList<PointF> points)
-	//{
-	//	var multiplicatinos = new List<List<LineEquation>>(points.Count);
-
-	//	for(int j = 0; j < points.Count; j++) {
-	//		for(int i = 0; i < points.Count; i++) {
-	//			if(i == j) continue;
-	//			if(multiplicatinos[j] is null) multiplicatinos[j] = new(points.Count - 1);
-
-	//			/* li(x) = (x-xj)/(xi-xj) = x/(xi-xj) - xj/(xi-xj)
-	//			 * k = 1/(xi-xj), b = -xj/(xi-xj)
-	//			 */
-	//			float xi = points[i].X, xj = points[j].X;
-	//			multiplicatinos[j].Add(new LineEquation {
-	//				K = 1 / (xi - xj),
-	//				B = -xj / (xi - xj)
-	//			}); // получим базисный полином l i-тый от х
-	//		}
-	//	}
-	//}
-	/* Для задачи генерации кривой безье через заданные точки существует т.н. интерполяционный многочлен Лагранжа
-	 * Многочлен Лагранжа представляет собой функцию, что если (x1...xk; y1...yk) - базовые точки, т.е. точки,
-	 * через которые должна проходить кривая безье, то L(xk) = yk, при этом в остальных точках значение соответствует
-	 * искомой кривой.
-	 */
-	public static IEnumerator<PointF> WithControlPoints(IEnumerable<PointF> originalPoints)
+	// https://algolist.manual.ru/maths/geom/equation/circle.php
+	public static PointF FindCenter(PointF p1, PointF p2, PointF p3)
 	{
-		//var enumer = originalPoints.GetEnumerator();
-
-		//if(!enumer.MoveNext()) yield break;
-		//PointF prev = enumer.Current;
-		//yield return prev;
-
-		//if(!enumer.MoveNext()) yield break;
-		//PointF start = enumer.Current;
-		//yield return prev;
-
-		//PointF end;
-		//float dX, dY;
-		//while(enumer.MoveNext()) {
-		//	end = enumer.Current;
-
-		//	/*                                #
-		//	 *         #
-		//	 *  #
-		//	 */
-		//	// предыдущая точка нижу начальной
-		//	if(prev.Y < start.Y) {
-		//		dY = (start.Y) + (start.Y - end.Y)
-		//	}
+		if(p1.Equals(p2) || p2.Equals(p3) || p3.Equals(p1)) {
+			throw new ArgumentException("Cannot build circle based on 3 points where some points are duplicated.");
+		}
+		if(p1.Y == p2.Y && p2.Y == p3.Y || p1.X == p2.X && p2.X == p3.X) {
+			throw new ArgumentException("Cannot build circle based on 3 points located on a single line.");
+		}
+		try {
+			var k1 = p1.X / p1.Y;
+			var k2 = p2.X / p2.Y;
+			var k3 = p3.X / p3.Y;
+			if(k1 == k2 && k2 == 3) throw new ArgumentException("Cannot build circle based on 3 points located on a single line.");
+		} catch(DivideByZeroException) { }
 
 
-		//	dX = (curr.X - prev.X) / 2;
-		//	dY = (curr.Y - prev.Y) / 2;
+		float A = p2.X - p1.X,
+		B = p2.Y - p1.Y,
+		C = p3.X - p1.X,
+		D = p3.Y - p1.Y,
+		E = A * (p1.X + p2.X) + B * (p1.Y + p2.Y),
+		F = C * (p1.X + p3.X) + D * (p1.Y + p3.Y),
+		G = 2 * (A * (p3.Y - p2.Y) - B * (p3.X - p2.X)),
+		Cx = (D * E - B * F) / G,
+		Cy = (A * F - C * E) / G;
 
-		//	yield return new PointF(dX, dY);
-		//	yield return curr;
-		//	prev = curr;
-		//}
+		return new(Cx, Cy);
+	}
 
-		throw new NotImplementedException();
+	public static IEnumerator<bool> CreatePatternResolver(string pattern)
+	{
+		if(string.IsNullOrWhiteSpace(pattern) || pattern.Any(c => c != '+' && c != '-')) {
+			throw new ArgumentException(nameof(pattern));
+		}
+
+		while(true) {
+			for(int i = 0; i < pattern.Length; i++) {
+				if(pattern[i] == '+') yield return true;
+				if(pattern[i] == '-') yield return false;
+			}
+		}
 	}
 
 }

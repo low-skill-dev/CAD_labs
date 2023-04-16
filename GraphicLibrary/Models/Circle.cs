@@ -27,7 +27,7 @@ public sealed class Circle : ALinearElement
 	public static IEnumerator<bool> GetBresenhamPatternResolver16()
 	{
 		while(true) {
-			 yield return true; // Линия сплошная.
+			yield return true; // Линия сплошная.
 		}
 	}
 
@@ -40,13 +40,16 @@ public sealed class Circle : ALinearElement
 	}
 	// by center and point on circle
 	public Circle(PointF center, PointF onCircle, Color color, IEnumerator<bool>? patternResolver = null)
-		: this(center, Common.GetCirleRadius(center, onCircle),color, patternResolver) { }
+		: this(center, Common.GetCirleRadius(center, onCircle), color, patternResolver) { }
+	//by 3 points
+	public Circle(PointF p1, PointF p2, PointF p3, Color color, IEnumerator<bool>? patternResolver = null)
+		: this(Common.FindCenter(p1, p2, p3), p1, color, patternResolver) { }
 	#endregion
 
 	#region inherited or overriden
 	public override Circle Clone()
 	{
-		return new Circle(this.Center,this.Radius,this.Color,this.PatternResolver);
+		return new Circle(this.Center, this.Radius, this.Color, this.PatternResolver);
 	}
 	public override void Move(float dX, float dY)
 	{
@@ -54,7 +57,7 @@ public sealed class Circle : ALinearElement
 	}
 	public override void Rotate(float angleR, PointF relativeTo) // basically rotate the center
 	{
-		this.Center = Common.RotatePoint(this.Center,relativeTo,angleR);
+		this.Center = Common.RotatePoint(this.Center, relativeTo, angleR);
 	}
 	public override void Scale(float scale, PointF relativeTo)
 	{

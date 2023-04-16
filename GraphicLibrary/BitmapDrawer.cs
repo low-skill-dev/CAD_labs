@@ -11,6 +11,7 @@ using static System.Net.Mime.MediaTypeNames;
 using Point = System.Drawing.Point;
 using PointF = GraphicLibrary.MathModels.PointF;
 using Rectangle = GraphicLibrary.Models.Rectangle;
+using Color = System.Drawing.Color;
 
 namespace GraphicLibrary;
 public class BitmapDrawer
@@ -25,6 +26,7 @@ public class BitmapDrawer
 	public List<Dot> Dots { get; private set; } = new();
 	public List<Line> Lines { get; private set; } = new();
 	public List<Circle> Circles { get; private set; } = new();
+	public List<Arc> Arcs { get; private set; } = new();
 	public List<Rectangle> Rectangles { get; private set; } = new();
 	public List<AreaFiller> AreaFillers { get; private set; } = new();
 	public List<InterpolatedPoints> InterpolatedPoints { get; private set; } = new();
@@ -42,17 +44,18 @@ public class BitmapDrawer
 	}
 
 	#region public
-	public void Reset()
+	public void Reset(bool noClear = true)
 	{
 		this.Dots.Clear();
 		this.Lines.Clear();
 		this.Rectangles.Clear();
 		this.Circles.Clear();
+		this.Arcs.Clear();
 		this.AreaFillers.Clear();
 		this.InterpolatedPoints.Clear();
 		this.LagrangePolys.Clear();
 		this.Besie2Polys.Clear();
-		this.CurrentFrame.Clear(Color.FromArgb(0, 0, 0, 0));
+		if(!noClear) this.CurrentFrame.Clear(Color.FromArgb(0, 0, 0, 0));
 	}
 
 	public void RenderFrame(bool noClear = false)
@@ -66,6 +69,7 @@ public class BitmapDrawer
 		this.Lines.ForEach(DrawLine);
 		this.Rectangles.ForEach(DrawRectangle);
 		this.Circles.ForEach(DrawCircle);
+		this.Arcs.ForEach(DrawArc);
 		this.AreaFillers.ForEach(x => FillAreaFrom(x));
 		this.InterpolatedPoints.ForEach(x => DrawInterpolated(x));
 		this.LagrangePolys.ForEach(x => DrawLagrange(x));
@@ -302,6 +306,34 @@ public class BitmapDrawer
 			var point = Common.FindPointOnCircle(center, radius, a);
 			var rounded = new Point((int)Round(point.X), (int)Round(point.Y));
 			BypassPoint(rounded, color, patternResolver);
+		}
+	}
+	#endregion
+	#region Arc
+	private void DrawArc(Arc arc)
+	{
+		var center = arc.Circle.Center;
+		var radius = arc.Circle.Radius;
+		var pattern = arc.Circle.PatternResolver;
+		var color = arc.Circle.Color;
+
+		var len = 2 * PI * arc.Circle.Radius;
+		var angleStep = 2 * PI / len;
+
+		float
+			start = arc.StartAngle,
+			end = arc.EndAngle;
+
+		if(start > end) Swap(ref start, ref end);
+
+		if(!arc.IsNegativeDirection) { // is positive direction
+			for(float a = start; a < end; a += angleStep) {
+				BypassPoint(Common.FindPointOnCircle(center, radius, a), color, pattern);
+			}
+		} else {
+			for(float a = end; a > start; a -= angleStep) {
+				BypassPoint(Common.FindPointOnCircle(center, radius, a), color, pattern);
+			}
 		}
 	}
 	#endregion

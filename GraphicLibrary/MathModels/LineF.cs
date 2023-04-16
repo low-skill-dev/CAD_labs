@@ -7,10 +7,13 @@ using System.Threading.Tasks;
 using PointF = GraphicLibrary.MathModels.PointF;
 
 namespace GraphicLibrary.MathModels;
-public struct LineF : IEquatable<LineF>, IEquatable<PointF>
+public class LineF : IEquatable<LineF>, IEquatable<PointF>
 {
 	public PointF Start;
 	public PointF End;
+
+	public PointF Left => Start.X < End.X ? Start : End;
+	public PointF Right => Start.X > End.X ? Start : End;
 
 	public LineF(PointF start, PointF end)
 	{
