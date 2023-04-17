@@ -33,15 +33,7 @@ public partial class MainWindow : Window
 		InitializeComponent();
 		disableBallFilling = true;
 
-		//gameRender = new((int)GameImage.Width, (int)GameImage.Height, 10) {
-		//	DisableBallFilling = disableBallFilling,
-		//	UseRandomColors = true
-		//};
-		//gameRender.StartNewGame();
-		//gameRender.RenderCurrentState();
-
-
-		//GameImage.Source = gameRender.CurrentFrameImage;
+		gameRender = null!;
 	}
 
 	private void StartNewGameBT_Click(object sender, RoutedEventArgs e)

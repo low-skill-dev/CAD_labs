@@ -5,8 +5,66 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:coursework"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" Width="1280" Height="650" ResizeMode="CanMinimize">
+	<Grid>
+		<StackPanel Orientation="Horizontal">
+			<StackPanel Margin="5" Width="200" Orientation="Vertical" HorizontalAlignment="Left">
+				<!--Выбор цвета фона-->
+				<StackPanel Orientation="Horizontal">
+					<Label Width="100">Цвет фона</Label>
+					<Button Name="SelectBackgroundColorBT" Width="100" Click="SelectBackgroundColorBT_Click"></Button>
+				</StackPanel>
+				<!--Выбор режима отображения осей-->
+				<StackPanel Orientation="Horizontal">
+					<Label Width="167">Показать оси</Label>
+					<CheckBox Name="DisplayAxesCB" Checked="DisplayAxesCB_Checked" Unchecked="DisplayAxesCB_Checked">
+						<CheckBox.LayoutTransform>
+							<ScaleTransform ScaleX="2.15" ScaleY="2.15" />
+						</CheckBox.LayoutTransform>
+					</CheckBox>
+				</StackPanel>
+				<StackPanel Orientation="Horizontal">
+					<Label Width="140">Точка относительности</Label>
+					<TextBox Width="60" Name="RelativenessPointTB" IsReadOnly="True"></TextBox>
+				</StackPanel>
+				<Button Name="SelectRelativenessPointBT" Click="SelectRelativenessPointBT_Click">ВЫБРАТЬ НАЖАТИЕМ</Button>
 
-    </Grid>
+				<Label Margin="0,10,0,0">ВЫДЕЛЕННЫЕ ОБЪЕКТЫ</Label>
+				<Button Margin="0" Name="FillClosedLoopsBT" Click="FillClosedLoopsBT_Click">ЗАЛИТЬ ЗАМКНУТЫЕ</Button>
+				<Button Margin="0" Name="SetColorSelectedBT" Click="SetColorSelectedBT_Click">ВЫБРАТЬ ЦВЕТ</Button>
+				<Button Margin="0" Name="MoveSelectedBT" Click="MoveSelectedBT_Click">ПЕРЕМЕСТИТЬ</Button>
+				<Button Margin="0" Name="RotateSelectedBT" Click="RotateSelectedBT_Click">ПОВЕРНУТЬ</Button>
+				<Button Margin="0" Name="DeleteSelectedBT" Click="DeleteSelectedBT_Click">УДАЛИТЬ</Button>
+				<StackPanel  Margin="0,5,0,0" Background="AliceBlue" Orientation="Vertical" Name="SelectedObjectsSP"  CanVerticallyScroll="True" Height="380">
+				
+				</StackPanel>
+
+			</StackPanel>
+			<StackPanel Orientation="Vertical" Width="1070">
+				<StackPanel Orientation="Horizontal" Width="1160" Margin="5" Height="30">
+					<!--Панель инструментов-->
+					<StackPanel Orientation="Horizontal">
+						<Button Name="PartialSelectionToolBT" Width="100" Height="30" Click="PartialSelectionToolBT_Click">
+							<StackPanel Orientation="Vertical">
+								<Label Margin="-8" HorizontalContentAlignment="Center" >ВЫДЕЛЕНИЕ</Label>
+								<Label Margin="-6" HorizontalContentAlignment="Center" FontSize="11">частичное вхожд.</Label>
+							</StackPanel>
+						</Button>
+						<Button Name="AccurateSelectionToolBT" Width="100" Height="30" Click="AccurateSelectionToolBT_Click">
+							<StackPanel Orientation="Vertical"> 
+								<Label Margin="-8" HorizontalContentAlignment="Center">ВЫДЕЛЕНИЕ</Label>
+								<Label Margin="-6" HorizontalContentAlignment="Center" FontSize="11">полное вхожд.</Label>
+							</StackPanel>
+						</Button>
+						<Button Name="PolyLineToolBT" Width="100" Height="30" Click="PolyLineToolBT_Click">ПОЛИЛИНИЯ</Button>
+						<Button  Name="CircleToolBT" Width="100" Height="30" Click="CircleToolBT_Click">ОКРУЖНОСТЬ</Button>
+						<Button Name="ArcToolBT" Width="100" Height="30" Click="ArcToolBT_Click">ДУГА</Button>
+						<Button  Name="FillerToolBT" Width="100" Height="30" Click="FillerToolBT_Click">ЗАЛИВКА</Button>
+						<TextBox Name="CurrentStatusTB" Height="30" Width="455" Margin="5,0,0,0" BorderBrush="Blue" BorderThickness="2"></TextBox>
+					</StackPanel>
+				</StackPanel>
+				<Image Name="DisplayedImageI" Width="1070" Height="595" MouseDown="DisplayedImageI_MouseDown"></Image>
+			</StackPanel>
+		</StackPanel>
+	</Grid>
 </Window>

@@ -82,7 +82,7 @@ public class PongCatcher : BitmapDrawer
 
 	public bool UseRandomColors { get; set; }
 
-	public List<FallingBall> Balls { get; private set; }
+	public List<FallingBall> Balls { get; private set; } = null!;
 	public List<FallingBall> FallingBalls { get; private set; }
 
 	public PongCatcher(int frameWidth, int frameHeight, int ballsCount,
@@ -132,12 +132,12 @@ public class PongCatcher : BitmapDrawer
 		foreach(var ball in Balls) {
 			base.AddCircle(new(ball.Location, ball.Radius, ball.BorderColor, _defaultPattern));
 			if(!DisableBallFilling)
-				base.AddFiller(new(ball.Location, ball.FillColor)); // TODO: disable if low performance
+				base.AddFiller(new(ball.Location, ball.FillColor));
 		}
 		foreach(var ball in FallingBalls) {
 			base.AddCircle(new(ball.Location, ball.Radius, ball.BorderColor, _defaultPattern));
 			if(!DisableBallFilling)
-				base.AddFiller(new(ball.Location, ball.FillColor)); // TODO: disable if low performance
+				base.AddFiller(new(ball.Location, ball.FillColor));
 		}
 
 		if(DefeatCircle is not null) {

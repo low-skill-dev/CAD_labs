@@ -56,7 +56,7 @@ public partial class MainWindow : Window
 		LoopButton.IsEnabled = false;
 
 		_currentState = States.WaitingFirstPoint;
-		_drawer = new((int)this.ShowedImage.Width, (int)this.ShowedImage.Height);
+		_drawer = new((int)this.ShowedImage.Width/2, (int)this.ShowedImage.Height/2);
 
 		_drawer.RenderFrame();
 		this.ShowedImage.Source = Common.BitmapToImageSource(_drawer.CurrentFrame.Bitmap);
@@ -105,6 +105,7 @@ public partial class MainWindow : Window
 	private void ShowedImage_Click(object sender, MouseButtonEventArgs e)
 	{
 		var pos = e.GetPosition(ShowedImage);
+		pos = new(pos.X / 2, pos.Y / 2);
 
 		if(_currentOverrideState != OverrideStates.None) {
 			if(_currentOverrideState == OverrideStates.WaitingMirrorPoint) {
@@ -324,7 +325,7 @@ public partial class MainWindow : Window
 	private void MirrorByLine_Click(object sender, RoutedEventArgs e)
 	{
 		if(this._mirrorAxeLine is not null) {
-			_drawer.MirrorAll(_mirrorAxeLine.Value);
+			_drawer.MirrorAll(_mirrorAxeLine);
 			_drawer.RenderFrame();
 			ShowedImage.Source = _drawer.CurrentFrameImage;
 		}

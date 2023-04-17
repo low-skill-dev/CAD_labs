@@ -419,4 +419,18 @@ public class CommonTests
 		}
 	}
 	#endregion
+
+	#region FindCenterAndRadius
+	[Fact]
+	public void CanBuildCircle()
+	{
+		var original = new PointF[] {
+			Common.FindPointOnCircle(new(0,0),1,-PI/6), new(1,0), new(0,1)
+		};
+
+		var actual = Common.FindCenter(original[0], original[1], original[2]);
+
+		Assert.True(actual.Equals(new PointF(0,0)));
+	}
+	#endregion
 }

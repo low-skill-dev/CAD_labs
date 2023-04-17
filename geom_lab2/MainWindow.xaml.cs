@@ -32,6 +32,7 @@ public partial class MainWindow : Window
 	private int selectedPointId;
 
 	private ImageEditor imageEditor;
+	private float sizeCoeff = 1f;
 
 	public MainWindow()
 	{
@@ -39,7 +40,7 @@ public partial class MainWindow : Window
 
 		InitializeComponent();
 
-		imageEditor = new((int)this.GameImage.Width, (int)this.GameImage.Height);
+		imageEditor = new((int)(this.GameImage.Width * sizeCoeff), (int)(this.GameImage.Height * sizeCoeff));
 		currentState = States.NoPointSelected;
 
 		imageEditor.RenderCurrentState();
@@ -48,7 +49,8 @@ public partial class MainWindow : Window
 
 	private void GameImage_MouseDown(object sender, MouseButtonEventArgs e)
 	{
-		var pos = (PointF)e.GetPosition((Image)sender);
+		var pos = sizeCoeff * (PointF)e.GetPosition((Image)sender);
+
 
 		if(currentState == States.NoPointSelected) {
 			var capture = imageEditor.FindSelectedByClickId(pos, true);
@@ -70,7 +72,7 @@ public partial class MainWindow : Window
 			imageEditor.ControlledDots[selectedPointId] = new(pos, false);
 			currentState = States.NoPointSelected;
 			selectedPointId = -1;
-			GC.Collect(GC.MaxGeneration,GCCollectionMode.Aggressive,true,true);
+			GC.Collect(GC.MaxGeneration, GCCollectionMode.Aggressive, true, true);
 		}
 
 		SetDotsCollection(imageEditor.ControlledDots.Select(x => x.Point), selectedPointId);
@@ -87,11 +89,11 @@ public partial class MainWindow : Window
 		if(currentState == States.PointSelected) {
 			imageEditor.ControlledDots[selectedPointId] = new(pos, true);
 
-			var dtms = (DateTime.UtcNow- LastMoved).TotalMilliseconds;
+			var dtms = (DateTime.UtcNow - LastMoved).TotalMilliseconds;
 
-			if(dtms>300)
+			if(dtms > 300)
 				imageEditor.RenderCurrentState();
-				this.GameImage.Source = imageEditor.CurrentFrameImage;
+			this.GameImage.Source = imageEditor.CurrentFrameImage;
 		}
 	}
 
@@ -105,8 +107,8 @@ public partial class MainWindow : Window
 		int count = 0;
 		foreach(var point in points) {
 			var wrapper = new StackPanel() { Orientation = Orientation.Horizontal };
-			var tbX = new TextBox() { Width = 145, FontSize=24, IsReadOnly=true, Background = count==selectedId ? yellowBrush: whiteBrush, Text = ((int)point.X).ToString() };
-			var tbY = new TextBox() { Width = 145, FontSize = 24, IsReadOnly = true, Background = count == selectedId ? yellowBrush : whiteBrush , Text = ((int)point.Y).ToString() };
+			var tbX = new TextBox() { Width = 145, FontSize = 24, IsReadOnly = true, Background = count == selectedId ? yellowBrush : whiteBrush, Text = ((int)point.X).ToString() };
+			var tbY = new TextBox() { Width = 145, FontSize = 24, IsReadOnly = true, Background = count == selectedId ? yellowBrush : whiteBrush, Text = ((int)point.Y).ToString() };
 
 			wrapper.Children.Add(tbX);
 			wrapper.Children.Add(tbY);
