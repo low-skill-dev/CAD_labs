@@ -12,6 +12,10 @@ public class PointF : IEquatable<PointF>, IEquatable<System.Drawing.Point>, IEqu
 {
 	public float X, Y;
 
+	public PointF()
+	{
+
+	}
 	public PointF(float x, float y)
 	{
 		X = x;

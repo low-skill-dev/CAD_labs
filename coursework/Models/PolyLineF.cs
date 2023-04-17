@@ -13,17 +13,11 @@ using PointF = GraphicLibrary.MathModels.PointF;
 
 namespace coursework.Models
 {
-	class PolyPointF : PointF
+	public class PolyPointF : PointF
 	{
-		public PointF Location {
-			get => this as PointF;
-			set {
-				base.X = value.X;
-				base.Y = value.Y;
-			}
-		}
 		public bool IsCirclePoint { get; set; }
 
+		public PolyPointF() : base(0, 0) { }
 		public PolyPointF(PointF location, bool isCirclePoint)
 			: base(location.X, location.Y)
 		{
@@ -37,13 +31,8 @@ namespace coursework.Models
 
 		public override PolyPointF Clone()
 		{
-			return new(new(Location.X, Location.Y), IsCirclePoint);
+			return new(new(base.X, base.Y), IsCirclePoint);
 		}
-
-
-#pragma warning disable CS8618
-		private PolyPointF() : base(0, 0) { }
-#pragma warning restore
 	}
 
 	//class LineF : AEditorElement, IPatterned
@@ -109,12 +98,14 @@ namespace coursework.Models
 	//	}
 	//}
 
-	class PolyLineF : AEditorElement, IPatterned
+	public class PolyLineF : AEditorElement, IPatterned
 	{
 		public List<PolyPointF> Points { get; init; } = new();
 		public override int ColorArgb { get; set; }
 		public string Pattern { get; set; }
-		public IEnumerator<bool> PatternResolver => Common.CreatePatternResolver(Pattern);
+		public IEnumerator<bool> PatternResolver => Common.CreatePatternResolver(Pattern ?? DefaultPattern);
+
+		public override string ToRussianString => $"Полилиния.\n";
 
 		public PolyLineF(int colorArgb = LightGreenArgb, string pattern = DefaultPattern)
 		{
@@ -135,16 +126,16 @@ namespace coursework.Models
 				var curr = Points.At(i);
 				var next = Points.At(i + 1);
 
-				var pp = prev.Location;
-				var pc = curr.Location;
-				var pn = next.Location;
+				var pp = prev;
+				var pc = curr;
+				var pn = next;
 
 				if(curr.IsCirclePoint) {
 					if(i == Points.Count - 1) {
 #if DEBUG
 						throw new ArgumentException("Circle creation point cannot be last at the polyline sequence.");
 #else
-						return new LineF(pp, pc);
+						result.Add(new LineF(pp, pc));
 #endif
 					}
 
@@ -169,20 +160,28 @@ namespace coursework.Models
 
 		public override void Move(PointF diff)
 		{
-			for(int i = 0; i < Points.Count; i++)
-				Points[i].Location += diff;
+			for(int i = 0; i < Points.Count; i++) {
+				Points[i].X += diff.X;
+				Points[i].Y += diff.Y;
+			}
 		}
 
 		public override void Rotate(float angleR, PointF relativeTo)
 		{
-			for(int i = 0; i < Points.Count; i++)
-				Points[i].Location = Common.RotatePoint(Points[i].Location, relativeTo, angleR);
+			for(int i = 0; i < Points.Count; i++) {
+				var rotated = Common.RotatePoint(Points[i], relativeTo, angleR);
+				Points[i].X = rotated.X;
+				Points[i].Y = rotated.Y;
+			}
 		}
 
 		public override void Scale(float scale, PointF relativeTo)
 		{
-			for(int i = 0; i < Points.Count; i++)
-				Points[i].Location = Common.ScalePoint(Points[i].Location, relativeTo, scale);
+			for(int i = 0; i < Points.Count; i++) {
+				var scaled = Common.ScalePoint(Points[i], relativeTo, scale);
+				Points[i].X = scaled.X;
+				Points[i].Y = scaled.Y;
+			}
 		}
 
 		public override PolyLineF Clone()

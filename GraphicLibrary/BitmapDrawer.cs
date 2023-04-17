@@ -34,6 +34,7 @@ public class BitmapDrawer
 	public List<InterpolatedPoints> Besie2Polys { get; private set; } = new();
 	public List<IGraphicalElement> ConstantObjects { get; private set; } = new();
 
+	public Color BackgroundColor { get; set; } = Color.FromArgb(0,0,0,0);
 	public bool AddAxes { get; set; } = true;
 
 	public BitmapDrawer(int frameWidth, int frameHeight)
@@ -63,7 +64,7 @@ public class BitmapDrawer
 		//using var currentFastLock = this.CurrentFrame.FastLock();
 		//this.CurrentFastLock = currentFastLock;
 
-		if(!noClear) this.CurrentFrame.Clear(Color.FromArgb(0, 0, 0, 0));
+		if(!noClear) this.CurrentFrame.Clear(BackgroundColor);
 
 		this.Dots.ForEach(DrawDot);
 		this.Lines.ForEach(DrawLine);
@@ -90,6 +91,7 @@ public class BitmapDrawer
 			if(obj is Dot) this.DrawDot((Dot)obj);
 			if(obj is Line) this.DrawLine((Line)obj);
 			if(obj is Circle) this.DrawCircle((Circle)obj);
+			if(obj is Rectangle) this.DrawRectangle((Rectangle)obj);
 		}
 
 		//this.CurrentFastLock = null;
@@ -316,6 +318,7 @@ public class BitmapDrawer
 		var radius = arc.Circle.Radius;
 		var pattern = arc.Circle.PatternResolver;
 		var color = arc.Circle.Color;
+		var isNeg = arc.IsNegativeDirection;
 
 		var len = 2 * PI * arc.Circle.Radius;
 		var angleStep = 2 * PI / len;
@@ -324,14 +327,17 @@ public class BitmapDrawer
 			start = arc.StartAngle,
 			end = arc.EndAngle;
 
-		if(start > end) Swap(ref start, ref end);
+		if(start > end) {
+			Swap(ref start, ref end);
+			isNeg = !isNeg;
+		}
 
-		if(!arc.IsNegativeDirection) { // is positive direction
+		if(!isNeg) { // is positive direction
 			for(float a = start; a < end; a += angleStep) {
 				BypassPoint(Common.FindPointOnCircle(center, radius, a), color, pattern);
 			}
 		} else {
-			for(float a = end; a > start; a -= angleStep) {
+			for(float a = start; a > (end - 2 * PI); a -= angleStep) {
 				BypassPoint(Common.FindPointOnCircle(center, radius, a), color, pattern);
 			}
 		}
@@ -341,12 +347,17 @@ public class BitmapDrawer
 	#region fillArea
 	private void FillAround(Point start, Color newColor, Color baseColor)
 	{
+		if(this.CurrentFrame.GetPixel(start.X,start.Y) != baseColor) {
+			baseColor = this.CurrentFrame.GetPixel(start.X, start.Y);
+		}
+
 		Stack<Point> points = new();
 		points.Push(start);
 
 		int maxCount = 0;
 
 		while(points.TryPop(out var point)) {
+			if(!isValidPoint(point)) continue;
 			if(points.Count > maxCount) maxCount = points.Count;
 			BypassPoint(new(point.X, point.Y), newColor, ALinearElement.GetDefaultPatternResolver());
 			for(int dx = -1; dx < 2; dx += 2) {

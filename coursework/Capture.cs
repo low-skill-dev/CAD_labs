@@ -29,9 +29,9 @@ namespace coursework
 		{
 			return (
 					rect.X,
-					rect.Y - rect.Height,
+					rect.Y,
 					rect.X + rect.Width,
-					rect.Y
+					rect.Y + +rect.Height
 				);
 		}
 
@@ -110,15 +110,22 @@ namespace coursework
 
 		internal static bool IsCaptured(RectangleF captureRect, CircleF circle, bool partialCaptureMode = false)
 		{
-			PointF curr;
-			for(int mx = -1; mx <= 1; mx += 1) { // m = multiplier, -1 -> 0 -> 1
-				for(int my = -1; my <= 1; my += 1) {
-					curr = circle.Center + new PointF(circle.Radius * mx, circle.Radius * my);
-					if(IsInBounds(captureRect, curr)) {
-						if(partialCaptureMode) return true; // точка попала и включен режим попадания части
-					} else {
-						if(!partialCaptureMode) return false; // точка не попала и включен режим частичного попадания
+			if(!partialCaptureMode) {
+				PointF curr;
+				for(int mx = -1; mx <= 1; mx += 1) { // m = multiplier, -1 -> 0 -> 1
+					for(int my = -1; my <= 1; my += 1) {
+						curr = circle.Center + new PointF(circle.Radius * mx, circle.Radius * my);
+						if(IsInBounds(captureRect, curr)) {
+							if(partialCaptureMode) return true; // точка попала и включен режим попадания части
+						} else {
+							if(!partialCaptureMode) return false; // точка не попала и включен режим частичного попадания
+						}
 					}
+				}
+			} else {
+				for(float a = 0; a < 2 * PI; a += 0.05f) {
+					var p = Common.FindPointOnCircle(circle.Center, circle.Radius, a);
+					if(IsInBounds(captureRect, p)) return true;
 				}
 			}
 
@@ -199,7 +206,7 @@ namespace coursework
 			var atMinX = k * minX + b;
 			var atMaxX = k * maxX + b;
 
-			if((line.Left.X < minX && atMinX > minY && atMinX < maxY) 
+			if((line.Left.X < minX && atMinX > minY && atMinX < maxY)
 				|| (line.Right.X > maxX && atMaxX > minY && atMaxX < maxY)) {
 				if(partialCaptureMode) return true; // точка попала и включен режим попадания части
 			} else {
@@ -213,7 +220,7 @@ namespace coursework
 		{
 			var objects = line.ToArcsAndLines();
 
-			foreach(LineF ln in  objects.Where(obj=> obj is LineF)) {
+			foreach(LineF ln in objects.Where(obj => obj is LineF)) {
 				if(IsCaptured(captureRect, ln, partialCaptureMode)) {
 					if(partialCaptureMode) return true; // точка попала и включен режим попадания части
 				} else {

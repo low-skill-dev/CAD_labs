@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:coursework"
         mc:Ignorable="d"
-        Title="MainWindow" Width="1280" Height="650" ResizeMode="CanMinimize">
+        Title="MainWindow" Width="1280" Height="650" ResizeMode="CanMinimize"
+		KeyDown="Window_KeyDown">
 	<Grid>
 		<StackPanel Orientation="Horizontal">
 			<StackPanel Margin="5" Width="200" Orientation="Vertical" HorizontalAlignment="Left">
@@ -13,6 +14,10 @@
 				<StackPanel Orientation="Horizontal">
 					<Label Width="100">Цвет фона</Label>
 					<Button Name="SelectBackgroundColorBT" Width="100" Click="SelectBackgroundColorBT_Click"></Button>
+				</StackPanel>
+				<StackPanel Orientation="Horizontal">
+					<Label Width="100">Цвет рисования</Label>
+					<Button Name="SelectDrawingColorBT" Width="100" Click="SelectDrawingColorBT_Click"></Button>
 				</StackPanel>
 				<!--Выбор режима отображения осей-->
 				<StackPanel Orientation="Horizontal">
@@ -24,20 +29,22 @@
 					</CheckBox>
 				</StackPanel>
 				<StackPanel Orientation="Horizontal">
-					<Label Width="140">Точка относительности</Label>
-					<TextBox Width="60" Name="RelativenessPointTB" IsReadOnly="True"></TextBox>
+					<Label Width="115">Точка относительн.</Label>
+					<TextBox Width="85" FontSize="16" Name="RelativenessPointTB" IsReadOnly="True"></TextBox>
 				</StackPanel>
 				<Button Name="SelectRelativenessPointBT" Click="SelectRelativenessPointBT_Click">ВЫБРАТЬ НАЖАТИЕМ</Button>
 
 				<Label Margin="0,10,0,0">ВЫДЕЛЕННЫЕ ОБЪЕКТЫ</Label>
-				<Button Margin="0" Name="FillClosedLoopsBT" Click="FillClosedLoopsBT_Click">ЗАЛИТЬ ЗАМКНУТЫЕ</Button>
-				<Button Margin="0" Name="SetColorSelectedBT" Click="SetColorSelectedBT_Click">ВЫБРАТЬ ЦВЕТ</Button>
+				<Button Margin="0" Name="FillClosedLoopsBT" Click="FillClosedLoopsBT_Click" Visibility="Collapsed">ЗАЛИТЬ ЗАМКНУТЫЕ</Button>
+				<Button Margin="0" Name="SetColorSelectedBT" Click="SetColorSelectedBT_Click">УСТАНОВИТЬ ЦВЕТ</Button>
 				<Button Margin="0" Name="MoveSelectedBT" Click="MoveSelectedBT_Click">ПЕРЕМЕСТИТЬ</Button>
 				<Button Margin="0" Name="RotateSelectedBT" Click="RotateSelectedBT_Click">ПОВЕРНУТЬ</Button>
 				<Button Margin="0" Name="DeleteSelectedBT" Click="DeleteSelectedBT_Click">УДАЛИТЬ</Button>
-				<StackPanel  Margin="0,5,0,0" Background="AliceBlue" Orientation="Vertical" Name="SelectedObjectsSP"  CanVerticallyScroll="True" Height="380">
-				
-				</StackPanel>
+				<ScrollViewer Margin="0,5,0,0" VerticalScrollBarVisibility="Visible" CanContentScroll="True">
+					<StackPanel Background="AliceBlue" Orientation="Vertical" Name="SelectedObjectsSP" Height="380">
+
+					</StackPanel>
+				</ScrollViewer>
 
 			</StackPanel>
 			<StackPanel Orientation="Vertical" Width="1070">
@@ -51,7 +58,7 @@
 							</StackPanel>
 						</Button>
 						<Button Name="AccurateSelectionToolBT" Width="100" Height="30" Click="AccurateSelectionToolBT_Click">
-							<StackPanel Orientation="Vertical"> 
+							<StackPanel Orientation="Vertical">
 								<Label Margin="-8" HorizontalContentAlignment="Center">ВЫДЕЛЕНИЕ</Label>
 								<Label Margin="-6" HorizontalContentAlignment="Center" FontSize="11">полное вхожд.</Label>
 							</StackPanel>
@@ -60,10 +67,13 @@
 						<Button  Name="CircleToolBT" Width="100" Height="30" Click="CircleToolBT_Click">ОКРУЖНОСТЬ</Button>
 						<Button Name="ArcToolBT" Width="100" Height="30" Click="ArcToolBT_Click">ДУГА</Button>
 						<Button  Name="FillerToolBT" Width="100" Height="30" Click="FillerToolBT_Click">ЗАЛИВКА</Button>
-						<TextBox Name="CurrentStatusTB" Height="30" Width="455" Margin="5,0,0,0" BorderBrush="Blue" BorderThickness="2"></TextBox>
+						<TextBox IsReadOnly="true" Name="CurrentStatusTB" FontSize="16" Height="30" Width="335" Margin="5,0,5,0" BorderBrush="Blue" BorderThickness="2"></TextBox>
+						<Button Name="SaveAsFile" Width="33" Height="30" Click="SaveAsFile_Click">СОХР</Button>
+						<Button  Name="LoadFromFile" Width="33" Height="30" Click="LoadFromFile_Click">ЗАГР</Button>
+						<Button  Name="ExportToFile" Width="33" Height="30" Click="ExportToFile_Click">ЭКСП</Button>
 					</StackPanel>
 				</StackPanel>
-				<Image Name="DisplayedImageI" Width="1070" Height="595" MouseDown="DisplayedImageI_MouseDown"></Image>
+				<Image Name="DisplayedImageI" Width="1070" Height="595" MouseDown="DisplayedImageI_MouseDown" MouseMove="DisplayedImageI_MouseMove"></Image>
 			</StackPanel>
 		</StackPanel>
 	</Grid>

@@ -9,13 +9,23 @@ using System.Threading.Tasks;
 
 namespace coursework.Models
 {
-	class CircleF : AEditorElement, IPatterned
+	public class CircleF : AEditorElement, IPatterned
 	{
 		public PointF Center { get; set; }
 		public float Radius { get; set; }
 		public override int ColorArgb { get; set; }
 		public string Pattern { get; set; }
+		public IEnumerator<bool> PatternResolver => Common.CreatePatternResolver(Pattern ?? DefaultPattern);
 
+		public override string ToRussianString => $"Окружность.\n" +
+			$"Центр: ({(int)Center.X},{(int)Center.Y}).\n" +
+			$"Радиус: {(int)Radius}.\n";
+
+		public CircleF()
+			:this(new(0f,0f),0)
+		{
+
+		}
 		public CircleF(PointF center, float radius, int colorArgb = LightGreenArgb, string pattern = DefaultPattern)
 		{
 			Center = center;

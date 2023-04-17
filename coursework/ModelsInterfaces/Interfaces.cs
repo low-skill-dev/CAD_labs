@@ -27,14 +27,20 @@ namespace coursework.ModelsInterfaces
     public interface IPatterned
     {
         public string Pattern { get; set; }
-		public IEnumerator<bool> PatternResolver => Common.CreatePatternResolver(Pattern);
+		public IEnumerator<bool> PatternResolver { get; }
 	}
+    public interface IToRussianString
+	{
+        public string ToRussianString { get; }
+    }
 
-    public abstract class AEditorElement : IMoveable, IScaleable, IRotateable, IColored
+    public abstract class AEditorElement : IMoveable, IScaleable, IRotateable, IColored, IToRussianString
 	{
         public const int LightGreenArgb = -7278960;
 		public const int LightCoralArgb = -1015680;
 		public const string DefaultPattern = "+";
+
+		public abstract string ToRussianString { get; }
 
 		public abstract int ColorArgb { get; set; }
 

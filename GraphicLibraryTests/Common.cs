@@ -367,7 +367,7 @@ public class CommonTests
 	[Fact]
 	public static void CanMirrorPointByLine_2()
 	{
-		var p1 =new  PointF(0, -1000);
+		var p1 = new PointF(0, -1000);
 		var rel = new LineF(new PointF(10, -10), new(10, 10));
 		var expected = new PointF(20, -1000);
 		var actual = Common.MirrorPoint(p1, rel);
@@ -430,7 +430,47 @@ public class CommonTests
 
 		var actual = Common.FindCenter(original[0], original[1], original[2]);
 
-		Assert.True(actual.Equals(new PointF(0,0)));
+		Assert.True(actual.Equals(new PointF(0, 0)));
+	}
+	#endregion
+
+	#region canFindAngle
+	private static readonly PointF center = new(0, 0);
+
+	[Fact]
+	public void CanFindAngle1()
+	{
+		PointF point;
+		float angle;
+
+		point = new PointF(10, 0);
+		angle = Common.FindAngleOfPointOnCircle(point, center);
+		Assert.Equal(0, angle);
+
+		point = new PointF(0, 10);
+		angle = Common.FindAngleOfPointOnCircle(point, center);
+		Assert.Equal(PI/2, angle);
+
+		point = new PointF(-10, 0);
+		angle = Common.FindAngleOfPointOnCircle(point, center);
+		Assert.Equal(PI, angle);
+
+		point = new PointF(0, -10);
+		angle = Common.FindAngleOfPointOnCircle(point, center);
+		Assert.Equal(PI+PI/2, angle);
+
+
+		float r = 10;
+		float diag = Common.GetCirleRadius(center, point);
+		Assert.Equal(r, diag);
+
+		var x = Sqrt(6f);
+		var y = Sqrt(4f);
+
+		point = new PointF(x, y);
+		angle = Common.FindAngleOfPointOnCircle(point, center);
+
+		Assert.True(angle > 0 && angle < (PI / 2));
 	}
 	#endregion
 }

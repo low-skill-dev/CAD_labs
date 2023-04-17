@@ -10,12 +10,20 @@ using System.Threading.Tasks;
 
 namespace coursework.Models
 {
-	class FillerF : AEditorElement
+	public class FillerF : AEditorElement
 	{
 		public PointF StartPoint { get; set; }
 		public bool EightDirectionsMode { get; set; } = false;
 		public override int ColorArgb { get; set; }
 
+		private string modeString => EightDirectionsMode ? "8 пикселей" : "4 пикселя";
+		public override string ToRussianString => $"Заливка.\nТочка начала: {StartPoint}.\nРежим: {modeString}.\n";
+
+		public FillerF()
+			:this(new(0,0))
+		{
+
+		}
 		public FillerF(PointF center, int colorArgb = LightGreenArgb)
 		{
 			StartPoint = center;

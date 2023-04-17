@@ -27,7 +27,7 @@ public static class Common
 			bitmapimage.StreamSource = memory;
 			bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
 			bitmapimage.EndInit();
-			
+
 			return bitmapimage;
 		}
 	}
@@ -265,6 +265,20 @@ public static class Common
 				if(pattern[i] == '-') yield return false;
 			}
 		}
+	}
+
+	public static float MinimalAngleBetweenAngles(float a1, float a2)
+	{
+		a1 = a1 % (2 * PI);
+		a2 = a2 % (2 * PI);
+
+		var dpositive = a2 - a1;
+		var dnegative = a1 - a2;
+
+		var dpositiveNorm = (a2 + 2 * PI) - a1;
+		var dnegativeNorm = (a1 + 2 * PI) - a2;
+
+		return Min(Min(Abs(dpositive), Abs(dnegative)), Min(Abs(dpositiveNorm), Abs(dnegativeNorm)));
 	}
 
 }
