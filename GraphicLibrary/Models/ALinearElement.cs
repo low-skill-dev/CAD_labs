@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using GraphicLibrary.MathModels;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GraphicLibrary.MathModels;
 using PointF = GraphicLibrary.MathModels.PointF;
 
 namespace GraphicLibrary.Models;
@@ -27,12 +22,14 @@ public abstract class ALinearElement : IGraphicalElement, IColoredElement
 	// solid line
 	public static IEnumerator<bool> GetDefaultPatternResolver()
 	{
-		while(true) yield return true;
+		while(true) {
+			yield return true;
+		}
 	}
 
 	public ALinearElement(Color color, IEnumerator<bool>? patternResolver = null)
 	{
-		this.Color = color;
-		this.PatternResolver = patternResolver ?? GetDefaultPatternResolver();
+		Color = color;
+		PatternResolver = patternResolver ?? GetDefaultPatternResolver();
 	}
 }

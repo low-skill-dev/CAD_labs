@@ -1,25 +1,16 @@
-﻿using System;
+﻿using GraphicLibrary;
+using GraphicLibrary.Models;
+using OpenTK.Mathematics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using GraphicLibrary;
-using GraphicLibrary.Models;
 using static System.MathF;
-using PointF = GraphicLibrary.MathModels.PointF;
 using LineF = GraphicLibrary.MathModels.LineF;
-using OpenTK.Mathematics;
-using FastTestConsoleApp;
-using System.Runtime.InteropServices;
+using PointF = GraphicLibrary.MathModels.PointF;
 
 namespace geom_lab3;
 
@@ -37,7 +28,7 @@ namespace geom_lab3;
  */
 public partial class MainWindow : Window
 {
-	enum States
+	private enum States
 	{
 		WaitingFirstPoint,
 		WaitingNextPoint,
@@ -46,35 +37,33 @@ public partial class MainWindow : Window
 
 
 	private States _currentState;
-	private BitmapDrawer _drawer;
+	private readonly BitmapDrawer _drawer;
 	private System.Windows.Point? _prevMirror;
 	private System.Windows.Point? _prevPoint;
 	private System.Windows.Point? _firstPoint;
+	private readonly List<LineF> _lines = new();
 
-	private List<PointF> _points = new();
-	private List<LineF> _lines = new();
-
-	public List<PointF> Points => _points;
+	public List<PointF> Points { get; } = new();
 
 
 	private System.Windows.Point _center => new(ShowedImage.Width / 2, ShowedImage.Height / 2);
 
-	private LineF? _mirrorAxeLine;
+	private readonly LineF? _mirrorAxeLine;
 
 	[DllImport("kernel32.dll")] public static extern bool AllocConsole();
 	public MainWindow()
 	{
-		AllocConsole();
+		_ = AllocConsole();
 		Console.WriteLine("Console is working!");
 
 		InitializeComponent();
 		LoopButton.IsEnabled = false;
 
 		_currentState = States.WaitingFirstPoint;
-		_drawer = new((int)this.ShowedImage.Width, (int)this.ShowedImage.Height);
+		_drawer = new((int)ShowedImage.Width, (int)ShowedImage.Height);
 
 		_drawer.RenderFrame();
-		this.ShowedImage.Source = Common.BitmapToImageSource(_drawer.CurrentFrame.Bitmap);
+		ShowedImage.Source = Common.BitmapToImageSource(_drawer.CurrentFrame.Bitmap);
 
 		StepSelector_PreviewMouseUp(null!, null!);
 		DebugOut.Text = $"Ожидание первой точки.";
@@ -82,7 +71,7 @@ public partial class MainWindow : Window
 
 	private void ClearButton_Click(object sender, RoutedEventArgs e)
 	{
-		_points.Clear();
+		Points.Clear();
 		_lines.Clear();
 
 		_drawer.Reset();
@@ -96,31 +85,35 @@ public partial class MainWindow : Window
 		_firstPoint = null;
 	}
 
+	[Obsolete]
 	private void ShowedImage_Click(object sender, MouseButtonEventArgs e)
 	{
-		if(_currentState == States.LoopCompleted) return;
+		if(_currentState == States.LoopCompleted) {
+			return;
+		}
 
 		var p = e.GetPosition(ShowedImage);
 		var pos = new PointF((float)p.X, (float)p.Y);
-		_points.Add(pos);
+		Points.Add(pos);
 
 		if(_currentState == States.WaitingFirstPoint) {
 			DebugOut.Text = $"({(int)pos.X}; {(int)pos.Y}) ... Ожидание следующей точки.";
 			_currentState = States.WaitingNextPoint;
 		} else if(_currentState == States.WaitingNextPoint) {
 			DebugOut.Text = $"({(int)pos.X}; {(int)pos.Y}) ... Ожидание следующей точки.";
-			_drawer.AddLine(_points[_points.Count - 2], _points[_points.Count - 1], null, ALinearElement.GetDefaultPatternResolver());
-			_lines.Add(new(_points[_points.Count - 2], _points[_points.Count - 1]));
+			_drawer.AddLine(Points[^2], Points[^1], null, ALinearElement.GetDefaultPatternResolver());
+			_lines.Add(new(Points[^2], Points[^1]));
 		}
 
-		if(_points.Count > 2) LoopButton.IsEnabled = true;
+		if(Points.Count > 2) {
+			LoopButton.IsEnabled = true;
+		}
 
 		_drawer.RenderFrame();
 		ShowedImage.Source = _drawer.CurrentFrameImage;
 	}
 
-
-
+	[Obsolete]
 	private void LoopButton_Click(object sender, RoutedEventArgs e)
 	{
 		try {
@@ -129,7 +122,7 @@ public partial class MainWindow : Window
 			LoopButton.IsEnabled = false;
 
 			_drawer.AddLine(
-				_points[_points.Count - 1], _points[0],
+				Points[^1], Points[0],
 				null, ALinearElement.GetDefaultPatternResolver());
 
 			_drawer.RenderFrame();
@@ -149,7 +142,7 @@ public partial class MainWindow : Window
 				? CreateUserResolver()
 				: GraphicLibrary.Models.Line.GetPatternResolver16();
 
-			var poly = new InterpolatedPoints(_points, (float)StepSelector.Value, System.Drawing.Color.Aqua, pattern) {
+			var poly = new InterpolatedPoints(Points, (float)StepSelector.Value, System.Drawing.Color.Aqua, pattern) {
 				Degree = (int)Math.Round(DegreeSelector.Value),
 				DebugDraw = DebugCurveOut.IsChecked ?? false
 			};
@@ -164,33 +157,38 @@ public partial class MainWindow : Window
 
 	private bool isPatternValid()
 	{
-		var userPattern = this.PatterResolver.Text;
+		var userPattern = PatterResolver.Text;
 		if(string.IsNullOrWhiteSpace(userPattern) || userPattern.Any(c => c != '+' && c != '-')) {
-			this.PatterResolver.Background = new SolidColorBrush(Colors.LightCoral);
+			PatterResolver.Background = new SolidColorBrush(Colors.LightCoral);
 			return false;
 		}
 
-		this.PatterResolver.Background = new SolidColorBrush(Colors.LightGreen);
+		PatterResolver.Background = new SolidColorBrush(Colors.LightGreen);
 		return true;
 	}
 	private IEnumerator<bool> CreateUserResolver()
 	{
-		var userPattern = this.PatterResolver.Text;
+		var userPattern = PatterResolver.Text;
 		while(true) {
-			foreach(char c in userPattern) {
-				if(c == '+') yield return true;
-				if(c == '-') yield return false;
+			foreach(var c in userPattern) {
+				if(c == '+') {
+					yield return true;
+				}
+
+				if(c == '-') {
+					yield return false;
+				}
 			}
 		}
 	}
 
 	private void StepSelector_PreviewMouseUp(object sender, MouseButtonEventArgs e)
 	{
-		this.SliderSelected.Text = ((int)Math.Round(StepSelector.Value)).ToString();
-		this.SliderDegreeSelected.Text = ((int)Math.Round(DegreeSelector.Value)).ToString();
-		this.LagrangeSliderSelected.Text = ((int)Math.Round(LagrangeStepSelector.Value)).ToString();
-		this.BesieSliderSelected.Text = ((int)Math.Round(BesieStepSelector.Value)).ToString();
-		this.BesieBendSelected.Text = BesieBendSelector.Value.ToString("0.00");
+		SliderSelected.Text = ((int)Math.Round(StepSelector.Value)).ToString();
+		SliderDegreeSelected.Text = ((int)Math.Round(DegreeSelector.Value)).ToString();
+		LagrangeSliderSelected.Text = ((int)Math.Round(LagrangeStepSelector.Value)).ToString();
+		BesieSliderSelected.Text = ((int)Math.Round(BesieStepSelector.Value)).ToString();
+		BesieBendSelected.Text = BesieBendSelector.Value.ToString("0.00");
 	}
 
 	private void DrawLagrangeBT_Click(object sender, RoutedEventArgs e)
@@ -200,7 +198,7 @@ public partial class MainWindow : Window
 
 			var pattern = GraphicLibrary.Models.Line.GetDefaultPatternResolver();
 
-			var poly = new InterpolatedPoints(_points, (float)LagrangeStepSelector.Value, System.Drawing.Color.FloralWhite, pattern) {
+			var poly = new InterpolatedPoints(Points, (float)LagrangeStepSelector.Value, System.Drawing.Color.FloralWhite, pattern) {
 				Degree = (int)Math.Round(DegreeSelector.Value),
 				DebugDraw = DebugCurveOut.IsChecked ?? false
 			};
@@ -221,7 +219,7 @@ public partial class MainWindow : Window
 				? CreateUserResolver()
 				: GraphicLibrary.Models.Line.GetPatternResolver16();
 
-			var poly = new InterpolatedPoints(_points, (float)BesieStepSelector.Value, System.Drawing.Color.HotPink, pattern) {
+			var poly = new InterpolatedPoints(Points, (float)BesieStepSelector.Value, System.Drawing.Color.HotPink, pattern) {
 				BendingFactor = (float)BesieBendSelector.Value,
 				DebugDraw = DebugCurveOut.IsChecked ?? false
 			};
@@ -257,22 +255,27 @@ public partial class MainWindow : Window
 	}
 
 
-	private SolidColorBrush redBrush => new SolidColorBrush(Color.FromArgb(
-		 System.Drawing.Color.LightCoral.A, 
-		 System.Drawing.Color.LightCoral.R, 
-		 System.Drawing.Color.LightCoral.G, 
-		 System.Drawing.Color.LightCoral.B));
-	private SolidColorBrush greenBrush => new SolidColorBrush(Color.FromArgb(
+	private SolidColorBrush redBrush => new(Color.FromArgb(
 		 System.Drawing.Color.LightCoral.A,
 		 System.Drawing.Color.LightCoral.R,
 		 System.Drawing.Color.LightCoral.G,
 		 System.Drawing.Color.LightCoral.B));
+	private SolidColorBrush greenBrush => new(Color.FromArgb(
+		 System.Drawing.Color.LightCoral.A,
+		 System.Drawing.Color.LightCoral.R,
+		 System.Drawing.Color.LightCoral.G,
+		 System.Drawing.Color.LightCoral.B));
+
+	[Obsolete]
 	private void CreateOpenGlBT_Click(object sender, RoutedEventArgs e)
 	{
-		if(string.IsNullOrWhiteSpace(RotatePerStepTB.Text))
+		if(string.IsNullOrWhiteSpace(RotatePerStepTB.Text)) {
 			RotatePerStepTB.Text = "90";
-		if(_currentState == States.WaitingNextPoint)
+		}
+
+		if(_currentState == States.WaitingNextPoint) {
 			LoopButton_Click(null!, null!);
+		}
 
 		float stepD = 0;
 		try {
@@ -282,8 +285,8 @@ public partial class MainWindow : Window
 			RotatePerStepTB.Background = redBrush;
 			return;
 		}
-		float stepR = stepD * float.Pi / 180;
-		var points = _points.ToArray();
+		var stepR = stepD * float.Pi / 180;
+		var points = Points.ToArray();
 
 		/* Проведем мысленное моделирование. Возьмем нашу фигуру. Положим её на плоскость XY таким образом, 
 		 * что линия, соединяющая её начальную и конечную точки совпадает с осью X. Этого можно добиться 
@@ -317,8 +320,8 @@ public partial class MainWindow : Window
 		for(float angleR = 0; angleR < 2 * PI; angleR += stepR) {
 			// создаваемая поверхность представляет 4-х угольник, т.е. 2 треугольника
 			var current = points3;
-			for(int i = 0; i < current.Length-1; i++) { // -1 т.к. первую и последнюю не соединяем - они лежат но оси!
-				// 1-й треугольник 4-х угольника
+			for(var i = 0; i < current.Length - 1; i++) { // -1 т.к. первую и последнюю не соединяем - они лежат но оси!
+														  // 1-й треугольник 4-х угольника
 				var p1 = RotateYZ(current.At(i), angleR);
 				var p2 = RotateYZ(current.At(i + 1), angleR);
 				var p3 = RotateYZ(current.At(i + 1), angleR + stepR);
@@ -330,12 +333,15 @@ public partial class MainWindow : Window
 				// 2-й треугольник 4-х угольника
 				var p4 = RotateYZ(current.At(i), angleR + stepR);
 
-				if(p1.Equals(p4)) continue;  // одна из точек лежит на оси (первый и последний треуг)		
+				if(p1.Equals(p4)) {
+					continue;  // одна из точек лежит на оси (первый и последний треуг)		
+				}
 
 				resultingConnected.Add(p1);
 				resultingConnected.Add(p3);
 				resultingConnected.Add(p4);
-		} }
+			}
+		}
 
 		// Нормализуем значения - OpenGL оперирует в пространстве от -1 до 1
 		var maxX = Abs(resultingConnected.Max(x => Abs(x.X)));

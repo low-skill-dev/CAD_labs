@@ -1,18 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using OpenTK.Graphics.OpenGL4;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Windowing.Common;
-using OpenTK.Windowing.Desktop;
-using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace FastTestConsoleApp;
 public class Shader : IDisposable
 {
-	Stopwatch timer = new();
+	private readonly Stopwatch timer = new();
 
 	public int Handle;
 
@@ -31,7 +23,7 @@ public class Shader : IDisposable
 		GL.CompileShader(vertexShader);
 		GL.CompileShader(fragmentShader);
 
-		GL.GetShader(vertexShader, ShaderParameter.CompileStatus, out int success);
+		GL.GetShader(vertexShader, ShaderParameter.CompileStatus, out var success);
 		if(success == 0) {
 			Console.WriteLine(
 				GL.GetShaderInfoLog(vertexShader));
@@ -79,9 +71,9 @@ public class Shader : IDisposable
 
 	public void Use()
 	{
-		double timeValue = timer.Elapsed.TotalSeconds;
-		float greenValue = (float)Math.Sin(timeValue) / 2.0f + 0.5f;
-		int vertexColorLocation = GL.GetUniformLocation(Handle, "ourColor");
+		var timeValue = timer.Elapsed.TotalSeconds;
+		var greenValue = (float)Math.Sin(timeValue) / 2.0f + 0.5f;
+		var vertexColorLocation = GL.GetUniformLocation(Handle, "ourColor");
 		GL.Uniform4(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
 		GL.UseProgram(Handle);

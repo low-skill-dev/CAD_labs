@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Runtime;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 using static System.MathF;
 
 namespace GraphicLibrary.MathModels;
@@ -29,7 +23,11 @@ public class PointF : IEquatable<PointF>, IEquatable<System.Drawing.Point>, IEqu
 
 
 
-	public static PointF operator *(float left, PointF right) => right * left;
+	public static PointF operator *(float left, PointF right)
+	{
+		return right * left;
+	}
+
 	public static PointF operator *(PointF left, float right)
 	{
 		return new PointF(left.X * right, left.Y * right);
@@ -83,42 +81,42 @@ public class PointF : IEquatable<PointF>, IEquatable<System.Drawing.Point>, IEqu
 	public bool Equals(PointF other)
 	{
 		return
-			Round(this.X, 3) == Round(other.X, 3)
+			Round(X, 3) == Round(other.X, 3)
 			&&
-			Round(this.Y, 3) == Round(other.Y, 3);
+			Round(Y, 3) == Round(other.Y, 3);
 	}
 
 	public Point ToRounded()
 	{
-		return new((int)Round(this.X), (int)Round(this.Y));
+		return new((int)Round(X), (int)Round(Y));
 	}
 
 	public bool Equals(System.Drawing.PointF other)
 	{
 		return
-			Round(this.X, 3) == Round(other.X, 3)
+			Round(X, 3) == Round(other.X, 3)
 			&&
-			Round(this.Y, 3) == Round(other.Y, 3);
+			Round(Y, 3) == Round(other.Y, 3);
 	}
 
 	public bool Equals(System.Windows.Point other)
 	{
 		return
-			Round(this.X, 3) == Round((float)other.X, 3)
+			Round(X, 3) == Round((float)other.X, 3)
 			&&
-			Round(this.Y, 3) == Round((float)other.Y, 3);
+			Round(Y, 3) == Round((float)other.Y, 3);
 	}
 
 	public bool Equals(Point other)
 	{
 		return
-			Round(this.X, 3) == other.X
+			Round(X, 3) == other.X
 			&&
-			Round(this.Y, 3) == other.Y;
+			Round(Y, 3) == other.Y;
 	}
 
 	public virtual PointF Clone()
 	{
-		return new(this.X, this.Y);
+		return new(X, Y);
 	}
 }

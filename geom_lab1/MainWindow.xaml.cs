@@ -1,19 +1,9 @@
 ﻿using InteractiveLibrary;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Runtime;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace geom_lab1;
 /// <summary>
@@ -27,9 +17,11 @@ public partial class MainWindow : Window
 	private float BallAccel;
 	private int totalRoundsPlayed;
 	private int wonRounds;
-	private bool disableBallFilling;
+	private readonly bool disableBallFilling;
 	public MainWindow()
 	{
+		GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
+
 		InitializeComponent();
 		disableBallFilling = true;
 
@@ -40,15 +32,15 @@ public partial class MainWindow : Window
 	{
 		if(BallAccel == 0) {
 			BallAccel = 100;
-			this.BallAccelerationTB.Text = BallAccel.ToString("0.00");
+			BallAccelerationTB.Text = BallAccel.ToString("0.00");
 		}
 
-		int ballsCount = 10;
+		var ballsCount = 10;
 		try {
 			ballsCount = int.Parse(NumofBallsTB.Text);
 		} catch { }
 
-		var parsed = int.TryParse(BallAccelerationTB.Text, out int accel);
+		var parsed = int.TryParse(BallAccelerationTB.Text, out var accel);
 		gameRender = new((int)GameImage.Width, (int)GameImage.Height, ballsCount, ballAcceleration: parsed ? accel : BallAccel, ballBorderColor: System.Drawing.Color.Yellow) {
 			DisableBallFilling = disableBallFilling,
 			UseRandomColors = false
@@ -59,7 +51,7 @@ public partial class MainWindow : Window
 
 		totalRoundsPlayed++;
 		UpdateTBs();
-		this.Player_message.Text = string.Empty;
+		Player_message.Text = string.Empty;
 
 		gameRender.StartNewGame();
 		gameRender.RenderCurrentState();
@@ -70,19 +62,19 @@ public partial class MainWindow : Window
 		breakThread = false;
 		ThreadStart thr = new(() => {
 			while(true) {
-				this.Dispatcher.Invoke(() => {
+				Dispatcher.Invoke(() => {
 					try {
 						gameRender.UpdateState(0.025f);
 					} catch(GameException ex) {
-						this.Player_message.Text = ex.Message;
+						Player_message.Text = ex.Message;
 						breakThread = true;
 						UpdateTBs();
 					} catch(GameWonException ex) {
-						this.Player_message.Text = ex.Message;
+						Player_message.Text = ex.Message;
 						breakThread = true;
 						wonRounds++;
-						this.BallAccel *= 1.5f;
-						this.BallAccelerationTB.Text = ((int)BallAccel).ToString();
+						BallAccel *= 1.5f;
+						BallAccelerationTB.Text = ((int)BallAccel).ToString();
 						UpdateTBs();
 					} finally {
 						gameRender.RenderCurrentState();
@@ -90,10 +82,11 @@ public partial class MainWindow : Window
 					}
 				});
 
-				if(!breakThread)
+				if(!breakThread) {
 					Thread.Sleep(25);
-				else
+				} else {
 					break;
+				}
 			}
 		});
 		updThread = new Thread(thr) { IsBackground = true };
@@ -104,14 +97,14 @@ public partial class MainWindow : Window
 
 	private void UpdateTBs()
 	{
-		this.TotalRoundsTB.Text = totalRoundsPlayed.ToString();
-		this.WonRoundsTB.Text = wonRounds.ToString();
+		TotalRoundsTB.Text = totalRoundsPlayed.ToString();
+		WonRoundsTB.Text = wonRounds.ToString();
 	}
 
 	private void GameImage_MouseMove(object sender, MouseEventArgs e)
 	{
 		var pos = e.GetPosition((Image)sender);
 
-		this.gameRender.SetPlatformX((float)pos.X);
+		gameRender.SetPlatformX((float)pos.X);
 	}
 }

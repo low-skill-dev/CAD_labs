@@ -2,20 +2,11 @@
 using GraphicLibrary.MathModels;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using PointF = GraphicLibrary.MathModels.PointF;
 
 namespace lab5;
@@ -23,14 +14,14 @@ namespace lab5;
 
 public partial class MainWindow : Window
 {
-	enum States
+	private enum States
 	{
 		WaitingFirstPoint,
 		WaitingNextPoint,
 		LoopCompleted,
 	}
 
-	enum OverrideStates
+	private enum OverrideStates
 	{
 		None,
 		WaitingMirrorPoint,
@@ -41,7 +32,7 @@ public partial class MainWindow : Window
 
 	private States _currentState;
 	private OverrideStates _currentOverrideState = OverrideStates.None;
-	private BitmapDrawer _drawer;
+	private readonly BitmapDrawer _drawer;
 	private System.Windows.Point? _prevMirror;
 	private System.Windows.Point? _prevPoint;
 	private System.Windows.Point? _firstPoint;
@@ -56,10 +47,10 @@ public partial class MainWindow : Window
 		LoopButton.IsEnabled = false;
 
 		_currentState = States.WaitingFirstPoint;
-		_drawer = new((int)this.ShowedImage.Width/2, (int)this.ShowedImage.Height/2);
+		_drawer = new((int)ShowedImage.Width / 2, (int)ShowedImage.Height / 2);
 
 		_drawer.RenderFrame();
-		this.ShowedImage.Source = Common.BitmapToImageSource(_drawer.CurrentFrame.Bitmap);
+		ShowedImage.Source = Common.BitmapToImageSource(_drawer.CurrentFrame.Bitmap);
 
 		relX.Text = relXscale.Text = _center.X.ToString();
 		relY.Text = relYscale.Text = _center.Y.ToString();
@@ -82,26 +73,32 @@ public partial class MainWindow : Window
 	}
 	private bool isPatternValid()
 	{
-		var userPattern = this.PatterResolver.Text;
+		var userPattern = PatterResolver.Text;
 		if(string.IsNullOrWhiteSpace(userPattern) || userPattern.Any(c => c != '+' && c != '-')) {
-			this.PatterResolver.Background = new SolidColorBrush(Colors.LightCoral);
+			PatterResolver.Background = new SolidColorBrush(Colors.LightCoral);
 			return false;
 		}
 
-		this.PatterResolver.Background = new SolidColorBrush(Colors.LightGreen);
+		PatterResolver.Background = new SolidColorBrush(Colors.LightGreen);
 		return true;
 	}
 	private IEnumerator<bool> CreateUserResolver()
 	{
-		var userPattern = this.PatterResolver.Text;
+		var userPattern = PatterResolver.Text;
 		while(true) {
-			foreach(char c in userPattern) {
-				if(c == '+') yield return true;
-				if(c == '-') yield return false;
+			foreach(var c in userPattern) {
+				if(c == '+') {
+					yield return true;
+				}
+
+				if(c == '-') {
+					yield return false;
+				}
 			}
 		}
 	}
 
+	[Obsolete]
 	private void ShowedImage_Click(object sender, MouseButtonEventArgs e)
 	{
 		var pos = e.GetPosition(ShowedImage);
@@ -109,19 +106,17 @@ public partial class MainWindow : Window
 
 		if(_currentOverrideState != OverrideStates.None) {
 			if(_currentOverrideState == OverrideStates.WaitingMirrorPoint) {
-				this.MirrorX.Text = pos.X.ToString();
-				this.MirrorY.Text = pos.Y.ToString();
+				MirrorX.Text = pos.X.ToString();
+				MirrorY.Text = pos.Y.ToString();
 				_currentOverrideState = OverrideStates.None;
-			}
-			else if(_currentOverrideState == OverrideStates.WaitingMirrorLine1) {
-				this.MirrorX1.Text = pos.X.ToString();
-				this.MirrorY1.Text = pos.Y.ToString();
+			} else if(_currentOverrideState == OverrideStates.WaitingMirrorLine1) {
+				MirrorX1.Text = pos.X.ToString();
+				MirrorY1.Text = pos.Y.ToString();
 				_prevMirror = pos;
 				_currentOverrideState = OverrideStates.WaitingMirrorLine2;
-			}
-			else if(_currentOverrideState == OverrideStates.WaitingMirrorLine2) {
-				this.MirrorX2.Text = pos.X.ToString();
-				this.MirrorY2.Text = pos.Y.ToString();
+			} else if(_currentOverrideState == OverrideStates.WaitingMirrorLine2) {
+				MirrorX2.Text = pos.X.ToString();
+				MirrorY2.Text = pos.Y.ToString();
 
 				var prev = _prevMirror!.Value;
 				var curr = pos;
@@ -129,15 +124,14 @@ public partial class MainWindow : Window
 				var start = (PointF)prev;
 				var end = new PointF((float)curr.X, (float)curr.Y);
 				_drawer.ConstantObjects.Clear();
-				_drawer.ConstantObjects.Add(new GraphicLibrary.Models.Line(start,end,System.Drawing.Color.Red,null));
-				this._mirrorAxeLine = new(start, end);
+				_drawer.ConstantObjects.Add(new GraphicLibrary.Models.Line(start, end, System.Drawing.Color.Red, null));
+				_mirrorAxeLine = new(start, end);
 
 				_drawer.RenderFrame();
 				ShowedImage.Source = _drawer.CurrentFrameImage;
 
 				_currentOverrideState = OverrideStates.None;
-			}
-			else if(_currentOverrideState == OverrideStates.WaitingFillingPoint) {
+			} else if(_currentOverrideState == OverrideStates.WaitingFillingPoint) {
 				_drawer.AddFiller(new(new((float)pos.X, (float)pos.Y), SelectedFillColor!.Value));
 
 				_drawer.RenderFrame();
@@ -146,7 +140,7 @@ public partial class MainWindow : Window
 			}
 		} else {
 			if(_currentState == States.WaitingFirstPoint) {
-				if(_firstPoint is null) _firstPoint = pos;
+				_firstPoint ??= pos;
 				_prevPoint = pos;
 				_currentState = States.WaitingNextPoint;
 				DebugOut.Text = $"({(int)pos.X}; {(int)pos.Y}) ... Ожидание следующей точки.";
@@ -194,6 +188,7 @@ public partial class MainWindow : Window
 		return;
 	}
 
+	[Obsolete]
 	private void LoopButton_Click(object sender, RoutedEventArgs e)
 	{
 		_currentState = States.WaitingFirstPoint;
@@ -215,13 +210,13 @@ public partial class MainWindow : Window
 
 	private void RotateButton_Click(object sender, RoutedEventArgs e)
 	{
-		System.Drawing.Point? relativeTo = null;
+		System.Drawing.Point? relativeTo;
 		try {
 			relativeTo = new(int.Parse(relX.Text), int.Parse(relY.Text));
 		} catch {
 			relativeTo = new(
-				(int)(this.ShowedImage.Width / 2),
-				(int)(this.ShowedImage.Height / 2));
+				(int)(ShowedImage.Width / 2),
+				(int)(ShowedImage.Height / 2));
 		}
 
 		float angleD;
@@ -231,7 +226,7 @@ public partial class MainWindow : Window
 			return;
 		}
 
-		float angleR = angleD * float.Pi / 180;
+		var angleR = angleD * float.Pi / 180;
 
 		_drawer.RotateAll(angleR, relativeTo.Value);
 		_drawer.RenderFrame();
@@ -240,8 +235,14 @@ public partial class MainWindow : Window
 
 	private void MoveButton_Click(object sender, RoutedEventArgs e)
 	{
-		if(string.IsNullOrWhiteSpace(diffX.Text)) diffX.Text = "0";
-		if(string.IsNullOrWhiteSpace(diffY.Text)) diffY.Text = "0";
+		if(string.IsNullOrWhiteSpace(diffX.Text)) {
+			diffX.Text = "0";
+		}
+
+		if(string.IsNullOrWhiteSpace(diffY.Text)) {
+			diffY.Text = "0";
+		}
+
 		try {
 			var dX = int.Parse(diffX.Text);
 			var dY = int.Parse(diffY.Text);
@@ -255,13 +256,13 @@ public partial class MainWindow : Window
 
 	private void DuplicateRotated_Click(object sender, RoutedEventArgs e)
 	{
-		System.Drawing.Point? relativeTo = null;
+		System.Drawing.Point? relativeTo;
 		try {
 			relativeTo = new(int.Parse(relX.Text), int.Parse(relY.Text));
 		} catch {
 			relativeTo = new(
-				(int)(this.ShowedImage.Width / 2),
-				(int)(this.ShowedImage.Height / 2));
+				(int)(ShowedImage.Width / 2),
+				(int)(ShowedImage.Height / 2));
 		}
 
 		float angleD;
@@ -271,7 +272,7 @@ public partial class MainWindow : Window
 			return;
 		}
 
-		float angleR = angleD * float.Pi / 180;
+		var angleR = angleD * float.Pi / 180;
 
 
 		_drawer.RotateAll(angleR, relativeTo.Value, true);
@@ -281,7 +282,7 @@ public partial class MainWindow : Window
 
 	private void ScaleButton_Click(object sender, RoutedEventArgs e)
 	{
-		System.Windows.Point? relativeTo = null;
+		System.Windows.Point? relativeTo;
 		try {
 			relativeTo = new(int.Parse(relXscale.Text), int.Parse(relYscale.Text));
 		} catch {
@@ -292,7 +293,9 @@ public partial class MainWindow : Window
 		float scale;
 		try {
 			scale = float.Parse(ScaleIn.Text.Replace(',', '.'), CultureInfo.InvariantCulture) % 360;
-			if(scale < 0.0001 || scale > 1000) return;
+			if(scale < 0.0001 || scale > 1000) {
+				return;
+			}
 		} catch {
 			return;
 		}
@@ -324,12 +327,11 @@ public partial class MainWindow : Window
 
 	private void MirrorByLine_Click(object sender, RoutedEventArgs e)
 	{
-		if(this._mirrorAxeLine is not null) {
+		if(_mirrorAxeLine is not null) {
 			_drawer.MirrorAll(_mirrorAxeLine);
 			_drawer.RenderFrame();
 			ShowedImage.Source = _drawer.CurrentFrameImage;
 		}
-
 	}
 
 	private void SelectMirrorLine2Button_Click(object sender, RoutedEventArgs e)
@@ -345,18 +347,21 @@ public partial class MainWindow : Window
 	private System.Drawing.Color? SelectedFillColor;
 	private void SelectColorButton_Click(object sender, RoutedEventArgs e)
 	{
-		System.Windows.Forms.ColorDialog colorDialog = new System.Windows.Forms.ColorDialog();
+		var colorDialog = new System.Windows.Forms.ColorDialog();
 		if(colorDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
 			SelectColorButton.Background = new SolidColorBrush(System.Windows.Media.Color
 				.FromArgb(colorDialog.Color.A, colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B));
-			this.SelectedFillColor = System.Drawing.Color
+			SelectedFillColor = System.Drawing.Color
 				.FromArgb(colorDialog.Color.A, colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B);
 		}
 	}
 
 	private void FillButton_Click(object sender, RoutedEventArgs e)
 	{
-		if(SelectedFillColor is null) return;
+		if(SelectedFillColor is null) {
+			return;
+		}
+
 		_currentOverrideState = OverrideStates.WaitingFillingPoint;
 	}
 

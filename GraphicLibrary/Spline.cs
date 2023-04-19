@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using static System.MathF;
+﻿using static System.MathF;
 using PointF = GraphicLibrary.MathModels.PointF;
 
 namespace GraphicLibrary;
@@ -17,7 +10,7 @@ public static class Spline
 	// Обеспечивает периодичность для заданного индекса
 	private static int GetPositiveIndex(int index, int fromTotal)
 	{
-		index = index % fromTotal;
+		index %= fromTotal;
 
 		return index >= 0 ? index : fromTotal + index;
 	}
@@ -41,9 +34,9 @@ public static class Spline
 		tr[0] = 1;
 		for(var k = 1; k < m; k++) {
 			for(var q = 0; q < stepsPerSpline; q++) {
-				tr[k] += Pow(2 * stepsPerSpline * Sin((PI * (q * m + k)) / N), -2 * degree);
+				tr[k] += Pow(2 * stepsPerSpline * Sin(PI * ((q * m) + k) / N), -2 * degree);
 			}
-			tr[k] *= Pow(2 * Sin((PI * k) / m), 2 * degree);
+			tr[k] *= Pow(2 * Sin(PI * k / m), 2 * degree);
 		}
 
 		// Вычисляем числитель.
@@ -53,8 +46,8 @@ public static class Spline
 			zre[j] = new PointF(0, 0);
 			zim[j] = new PointF(0, 0);
 			for(var k = 0; k < m; k++) {
-				zre[j] += orig[k] * Cos((-2 * PI * j * k) / m);
-				zim[j] += orig[k] * Sin((-2 * PI * j * k) / m);
+				zre[j] += orig[k] * Cos(-2 * PI * j * k / m);
+				zim[j] += orig[k] * Sin(-2 * PI * j * k / m);
 			}
 		}
 
@@ -63,7 +56,7 @@ public static class Spline
 		for(var p = 0; p < m; p++) {
 			result[p] = new PointF(0, 0);
 			for(var k = 0; k < m; k++) {
-				var d = (zre[k] * Cos((2 * PI * k * p) / m)) - (zim[k] * Sin((2 * PI * k * p) / m));
+				var d = (zre[k] * Cos(2 * PI * k * p / m)) - (zim[k] * Sin(2 * PI * k * p / m));
 				d *= 1f / tr[k];
 				result[p] += d;
 			}
@@ -87,13 +80,13 @@ public static class Spline
 
 		for(var j = 0; j < N; j++) {
 			if(j >= 0 && j <= stepsBetweenBasePoints - 1) {
-				qSpline[j] = (1f * stepsBetweenBasePoints - j) / stepsBetweenBasePoints;
+				qSpline[j] = ((1f * stepsBetweenBasePoints) - j) / stepsBetweenBasePoints;
 			} else
 			if(j >= stepsBetweenBasePoints && j <= N - stepsBetweenBasePoints) {
 				qSpline[j] = 0;
 			} else
 			if(j >= N - stepsBetweenBasePoints + 1 && j <= N - 1) {
-				qSpline[j] = (1f * j - N + stepsBetweenBasePoints) / stepsBetweenBasePoints;
+				qSpline[j] = ((1f * j) - N + stepsBetweenBasePoints) / stepsBetweenBasePoints;
 			}
 		}
 
@@ -122,7 +115,7 @@ public static class Spline
 		for(var j = 0; j < N; j++) {
 			sSpline[1][j] = new PointF(0, 0);
 			for(var p = 0; p < m; p++) {
-				sSpline[1][j] += basePoints[p] * bSplineCoeffs[GetPositiveIndex(j - p * stepsBetweenBasicPoints, N)];
+				sSpline[1][j] += basePoints[p] * bSplineCoeffs[GetPositiveIndex(j - (p * stepsBetweenBasicPoints), N)];
 			}
 		}
 

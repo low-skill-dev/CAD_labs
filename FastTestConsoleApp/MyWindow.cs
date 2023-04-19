@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
-using static System.MathF;
-using OpenTK.Graphics.OpenGL4;
+﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using System.Diagnostics;
+using static System.MathF;
 
 namespace FastTestConsoleApp;
 public class MyWindow : GameWindow
@@ -22,17 +15,15 @@ public class MyWindow : GameWindow
 		 -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
 		  0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top 
     };
-	uint[] indices = {  // note that we start from 0!
+	private readonly uint[] indices = {  // note that we start from 0!
 		0, 1, 3,   // first triangle
 		1, 2, 3    // second triangle
 	};
-
-	int VertexBufferObject;
-	int VertexArrayObject;
-	int ElementBufferObject;
-	Shader Shader;
-
-	Stopwatch timer = new();
+	private int VertexBufferObject;
+	private int VertexArrayObject;
+	private int ElementBufferObject;
+	private readonly Shader Shader;
+	private readonly Stopwatch timer = new();
 
 
 	public MyWindow(int width, int height, string title = nameof(MyWindow))
@@ -92,8 +83,8 @@ public class MyWindow : GameWindow
 		Shader.Use();
 
 		var timeValue = (float)timer.Elapsed.TotalSeconds;
-		float greenValue = Abs(Sin(timeValue));
-		int vertexColorLocation = GL.GetUniformLocation(Shader.Handle, "ourColor");
+		var greenValue = Abs(Sin(timeValue));
+		var vertexColorLocation = GL.GetUniformLocation(Shader.Handle, "ourColor");
 		GL.Uniform4(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
 

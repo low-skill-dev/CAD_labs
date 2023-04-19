@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using GraphicLibrary.MathModels;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GraphicLibrary.MathModels;
 using PointF = GraphicLibrary.MathModels.PointF;
 
 namespace GraphicLibrary.Models;
@@ -15,8 +10,8 @@ public class AreaFiller : IGraphicalElement, IColoredElement
 
 	public AreaFiller(PointF start, Color color)
 	{
-		this.StartFilling = start;
-		this.Color = color;
+		StartFilling = start;
+		Color = color;
 	}
 
 
@@ -30,7 +25,7 @@ public class AreaFiller : IGraphicalElement, IColoredElement
 	}
 	public void Scale(float scale, PointF relativeTo)
 	{
-		StartFilling = Common.ScalePoint(StartFilling,relativeTo,scale);
+		StartFilling = Common.ScalePoint(StartFilling, relativeTo, scale);
 	}
 	public void Mirror(PointF relativeTo)
 	{

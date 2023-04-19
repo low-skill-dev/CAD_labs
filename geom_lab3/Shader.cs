@@ -1,15 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using OpenTK.Graphics.OpenGL4;
+using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
-using OpenTK.Windowing.Common;
-using OpenTK.Windowing.Desktop;
-using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace geom_lab3;
 public class Shader : IDisposable
@@ -29,7 +20,7 @@ public class Shader : IDisposable
 		GL.CompileShader(vertexShader);
 		GL.CompileShader(fragmentShader);
 
-		GL.GetShader(vertexShader, ShaderParameter.CompileStatus, out int success);
+		GL.GetShader(vertexShader, ShaderParameter.CompileStatus, out var success);
 		if(success == 0) {
 			Console.WriteLine(
 				GL.GetShaderInfoLog(vertexShader));
@@ -75,7 +66,7 @@ public class Shader : IDisposable
 		}
 	}
 
-	private float rC => Random.Shared.NextSingle() / 2 + 0.25f;
+	private float rC => (Random.Shared.NextSingle() / 2) + 0.25f;
 	public void Use()
 	{
 		GL.UseProgram(Handle);

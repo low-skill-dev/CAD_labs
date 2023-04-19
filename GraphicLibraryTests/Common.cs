@@ -1,10 +1,7 @@
-﻿using System.Drawing;
-using System.Linq;
-using System.Windows.Media;
-using GraphicLibrary;
+﻿using GraphicLibrary;
 using GraphicLibrary.MathModels;
 using GraphicLibrary.Models;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
+using System.Drawing;
 using Xunit;
 using Xunit.Abstractions;
 using static System.MathF;
@@ -17,11 +14,13 @@ public class CommonTests
 {
 	private static IEnumerable<T> IncapsulateEnumerator<T>(IEnumerator<T> enumer)
 	{
-		while(enumer.MoveNext()) yield return enumer.Current;
+		while(enumer.MoveNext()) {
+			yield return enumer.Current;
+		}
 	}
 
 
-	private ITestOutputHelper _output;
+	private readonly ITestOutputHelper _output;
 	public CommonTests(ITestOutputHelper output)
 	{
 		_output = output;
@@ -29,7 +28,7 @@ public class CommonTests
 
 
 	#region Rotate
-	private static Point rel = new Point(0, 0);
+	private static Point rel = new(0, 0);
 
 	private static PointF Round2(PointF point)
 	{
@@ -56,7 +55,7 @@ public class CommonTests
 	public void CanRotate45()
 	{
 		int x = 10, y = 10;
-		var p1 = new Point((int)Round(Sqrt(x * x + y * y)), 0);
+		var p1 = new Point((int)Round(Sqrt((x * x) + (y * y))), 0);
 		var angle = PI / 4;
 
 		var expected = new Point(10, 10);
@@ -106,7 +105,7 @@ public class CommonTests
 	public void CanRotate359()
 	{
 		var p1 = new Point(10, 10);
-		var angle = PI * 2 - 1 / 1000; // almost 360
+		var angle = (PI * 2) - (1 / 1000); // almost 360
 
 		var expected = new Point(10, 10);
 		var actual = Common.RotatePoint(p1, rel, angle);
@@ -141,8 +140,7 @@ public class CommonTests
 
 
 		line.Rotate(PI, rel);
-
-		var p1e = new Point(5, 10);
+		_ = new Point(5, 10);
 		var p2e = new Point(10, 5);
 
 		//Assert.Equal(p1e, line.Start);
@@ -160,7 +158,7 @@ public class CommonTests
 		Line line = new(p1, p2, System.Drawing.Color.White);
 
 		float angleD = 90;
-		float angleR = angleD * float.Pi / 180;
+		var angleR = angleD * float.Pi / 180;
 
 		line.Rotate(angleR, rel);
 
@@ -183,7 +181,7 @@ public class CommonTests
 		Line line = new(p1, p2, System.Drawing.Color.White);
 
 		float angleD = 90;
-		float angleR = angleD * float.Pi / 180;
+		var angleR = angleD * float.Pi / 180;
 
 		line.Rotate(angleR, rel);
 
@@ -224,16 +222,16 @@ public class CommonTests
 		var p2 = new System.Drawing.PointF(PI, PI);
 		var (k, b) = Common.FindLinearEquation(p1, p2);
 
-		Assert.Equal((double)1, (double)k, 3);
-		Assert.Equal((double)0, (double)b, 3);
+		Assert.Equal(1, (double)k, 3);
+		Assert.Equal(0, (double)b, 3);
 
 
 		p1 = new System.Drawing.PointF(1, 1);
 		p2 = new System.Drawing.PointF(-PI, -PI);
 		(k, b) = Common.FindLinearEquation(p1, p2);
 
-		Assert.Equal((double)1, (double)k, 3);
-		Assert.Equal((double)0, (double)b, 3);
+		Assert.Equal(1, (double)k, 3);
+		Assert.Equal(0, (double)b, 3);
 	}
 	[Fact]
 	public void CanFindEquation_2()
@@ -243,7 +241,7 @@ public class CommonTests
 		var (k, b) = Common.FindLinearEquation(p1, p2);
 
 		Assert.Equal((double)0.5, (double)k, 3);
-		Assert.Equal((double)0, (double)b, 3);
+		Assert.Equal(0, (double)b, 3);
 	}
 
 	[Fact]
@@ -253,16 +251,16 @@ public class CommonTests
 		var p2 = new System.Drawing.PointF(PI, 0); // horizontal line
 		var (k, b) = Common.FindLinearEquation(p1, p2);
 
-		Assert.Equal((double)0, (double)k, 3);
-		Assert.Equal((double)0, (double)b, 3);
+		Assert.Equal(0, (double)k, 3);
+		Assert.Equal(0, (double)b, 3);
 
 
 		p1 = new System.Drawing.PointF(0, PI);
 		p2 = new System.Drawing.PointF(PI, PI); // horizontal line
 		(k, b) = Common.FindLinearEquation(p1, p2);
 
-		Assert.Equal((double)0, (double)k, 3);
-		Assert.Equal((double)PI, (double)b, 3);
+		Assert.Equal(0, (double)k, 3);
+		Assert.Equal(PI, (double)b, 3);
 	}
 
 
@@ -449,7 +447,7 @@ public class CommonTests
 
 		point = new PointF(0, 10);
 		angle = Common.FindAngleOfPointOnCircle(point, center);
-		Assert.Equal(PI/2, angle);
+		Assert.Equal(PI / 2, angle);
 
 		point = new PointF(-10, 0);
 		angle = Common.FindAngleOfPointOnCircle(point, center);
@@ -457,11 +455,11 @@ public class CommonTests
 
 		point = new PointF(0, -10);
 		angle = Common.FindAngleOfPointOnCircle(point, center);
-		Assert.Equal(PI+PI/2, angle);
+		Assert.Equal(PI + (PI / 2), angle);
 
 
 		float r = 10;
-		float diag = Common.GetCirleRadius(center, point);
+		var diag = Common.GetCirleRadius(center, point);
 		Assert.Equal(r, diag);
 
 		var x = Sqrt(6f);

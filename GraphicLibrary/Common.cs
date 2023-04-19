@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Media.Imaging;
+﻿using GraphicLibrary.MathModels;
 using System.Drawing;
-using System.Linq;
-using System.IO;
+using System.Windows.Media.Imaging;
 using static System.MathF;
-using System.Security.Cryptography.X509Certificates;
-using GraphicLibrary.MathModels;
 using PointF = GraphicLibrary.MathModels.PointF;
-using System.Windows.Media;
-using System.Drawing.Imaging;
 
 namespace GraphicLibrary;
 
@@ -19,56 +11,64 @@ public static class Common
 	// https://stackoverflow.com/a/22501616/11325184
 	public static BitmapImage BitmapToImageSource(Bitmap bitmap)
 	{
-		using(MemoryStream memory = new MemoryStream()) {
-			bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
-			memory.Position = 0;
-			BitmapImage bitmapimage = new BitmapImage();
-			bitmapimage.BeginInit();
-			bitmapimage.StreamSource = memory;
-			bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
-			bitmapimage.EndInit();
+		using var memory = new MemoryStream();
+		bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
+		memory.Position = 0;
+		var bitmapimage = new BitmapImage();
+		bitmapimage.BeginInit();
+		bitmapimage.StreamSource = memory;
+		bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
+		bitmapimage.EndInit();
 
-			return bitmapimage;
-		}
+		return bitmapimage;
 	}
 
 	// System.Windows.Point -> System.Drawing.PointF
 	public static PointF WindowsToDrawing(System.Windows.Point p)
-		=> new PointF((float)p.X, (float)p.Y);
+	{
+		return new((float)p.X, (float)p.Y);
+	}
 
 	// радиус окружности по теореме пифагора
 	public static float GetCirleRadius(PointF center, PointF onCirle)
 	{
 		var dX = onCirle.X - center.X;
 		var dY = onCirle.Y - center.Y;
-		return Sqrt(dX * dX + dY * dY);
+		return Sqrt((dX * dX) + (dY * dY));
 	}
 
 	// Находит угол отклонения точки по её положению относительно центра окружности
 	public static float FindAngleOfPointOnCircle(PointF target, PointF center)
 	{
-		int part = 0; // найдем четверть окружности
+		var part = 0; // найдем четверть окружности
 		float rx = target.X - center.X, ry = target.Y - center.Y; // relativeX, relativeY
-		if(rx >= 0) part = ry >= 0 ? 1 : 4;
-		if(rx < 0) part = ry >= 0 ? 2 : 3;
+		if(rx >= 0) {
+			part = ry >= 0 ? 1 : 4;
+		}
+
+		if(rx < 0) {
+			part = ry >= 0 ? 2 : 3;
+		}
 
 		/* Теперь вычислим изначальный и новый углы
 		 * К углу относительно ближайшей оси добавить остальную часть
 		 * (PI/2) - число радиан в четверти
 		 */
-		return (PI / 2) * (part - 1) + (part == 1 || part == 3 ?
+		return (PI / 2 * (part - 1)) + (part == 1 || part == 3 ?
 			Atan(Abs(ry) / Abs(rx)) : Atan(Abs(rx) / Abs(ry)));
 	}
 	// Находит координаты точки окружности, отклоненной на соответствующий угл.
 	public static PointF FindPointOnCircle(PointF center, float radius, float angleR)
 	{
-		angleR = angleR % (PI * 2); // 2 радиана = полный цикл
-		if(angleR < 0) angleR = (PI * 2) + angleR; // с целью упрощения сведем все к положительным значениям
+		angleR %= PI * 2; // 2 радиана = полный цикл
+		if(angleR < 0) {
+			angleR = (PI * 2) + angleR; // с целью упрощения сведем все к положительным значениям
+		}
 
-		int part = (int)(angleR / (PI * 2)); // чертверть окружности
+		var part = (int)(angleR / (PI * 2)); // чертверть окружности
 
-		float X = radius * (part % 2 == 1 ? Cos(angleR) : Sin(angleR));
-		float Y = radius * (part % 2 == 1 ? Sin(angleR) : Cos(angleR));
+		var X = radius * (part % 2 == 1 ? Cos(angleR) : Sin(angleR));
+		var Y = radius * (part % 2 == 1 ? Sin(angleR) : Cos(angleR));
 
 		return center + (part % 2 == 1 ? new PointF(X, Y) : new PointF(Y, X));
 	}
@@ -83,11 +83,18 @@ public static class Common
 	 */
 	public static PointF RotatePoint(PointF target, PointF relativeTo, float angleR)
 	{
-		if(angleR == 0) return target; // поворот на ноль
-		if(target.Equals(relativeTo)) return target; // поворот относительно себя самой не изменяет точку
+		if(angleR == 0) {
+			return target; // поворот на ноль
+		}
 
-		angleR = angleR % (PI * 2); // 2 радиана = полный цикл
-		if(angleR < 0) angleR = (PI * 2) + angleR; // с целью упрощения сведем все к положительным значениям
+		if(target.Equals(relativeTo)) {
+			return target; // поворот относительно себя самой не изменяет точку
+		}
+
+		angleR %= PI * 2; // 2 радиана = полный цикл
+		if(angleR < 0) {
+			angleR = (PI * 2) + angleR; // с целью упрощения сведем все к положительным значениям
+		}
 
 		/* Теперь вычислим изначальный и новый углы
 		 * К углу относительно ближайшей оси добавить остальную часть
@@ -132,12 +139,14 @@ public static class Common
 			x1 = p1.X, y1 = p1.Y,
 			x2 = p2.X, y2 = p2.Y,
 			k = (y2 - y1) / (x2 - x1),
-			b = (p1.Y - k * p1.X);
+			b = p1.Y - (k * p1.X);
 
 		return (k, b);
 	}
 	public static (float k, float b) FindLinearEquation(LineF line)
-		=> FindLinearEquation(line.Start, line.End);
+	{
+		return FindLinearEquation(line.Start, line.End);
+	}
 
 	/* Находит уравнение прямой, проходяшей через точку p и имеющей угловой коэффициент k.
 	 * y = k * (x-x1) + y1.
@@ -146,7 +155,7 @@ public static class Common
 	 */
 	public static (float k, float b) FindLinearEquation(float k, PointF p)
 	{
-		return (k, -(k * p.X - p.Y));
+		return (k, -((k * p.X) - p.Y));
 	}
 
 	/* Задача отражения точки относительно линии является надзадачей к задаче отражения относительно точки.
@@ -180,7 +189,7 @@ public static class Common
 		var (kNormal, bNormal) = FindLinearEquation(-1 / k, target);
 
 		var xMirror = -(b - bNormal) / (k - kNormal);
-		var yMirror = kNormal * xMirror + bNormal; // y = kx + b
+		var yMirror = (kNormal * xMirror) + bNormal; // y = kx + b
 
 		return MirrorPoint(target, new PointF(xMirror, yMirror));
 	}
@@ -209,7 +218,7 @@ public static class Common
 		var points = lines.Select(x => x.End).ToArray();
 
 		float sum = 0;
-		for(int i = 1; i < points.Length; i++) {
+		for(var i = 1; i < points.Length; i++) {
 			var pC = points[i];
 			var pP = points[i - 1];
 
@@ -217,7 +226,7 @@ public static class Common
 		}
 
 		var pF = points[0];
-		var pL = points[points.Length - 1];
+		var pL = points[^1];
 		sum += (pL.X + pF.X) * (pL.Y - pF.Y); // включая первую
 
 		return Abs(sum) / 2;
@@ -229,14 +238,16 @@ public static class Common
 		if(p1.Equals(p2) || p2.Equals(p3) || p3.Equals(p1)) {
 			throw new ArgumentException("Cannot build circle based on 3 points where some points are duplicated.");
 		}
-		if(p1.Y == p2.Y && p2.Y == p3.Y || p1.X == p2.X && p2.X == p3.X) {
+		if((p1.Y == p2.Y && p2.Y == p3.Y) || (p1.X == p2.X && p2.X == p3.X)) {
 			throw new ArgumentException("Cannot build circle based on 3 points located on a single line.");
 		}
 		try {
 			var k1 = p1.X / p1.Y;
 			var k2 = p2.X / p2.Y;
 			var k3 = p3.X / p3.Y;
-			if(k1 == k2 && k2 == 3) throw new ArgumentException("Cannot build circle based on 3 points located on a single line.");
+			if(k1 == k2 && k2 == 3) {
+				throw new ArgumentException("Cannot build circle based on 3 points located on a single line.");
+			}
 		} catch(DivideByZeroException) { }
 
 
@@ -244,11 +255,11 @@ public static class Common
 		B = p2.Y - p1.Y,
 		C = p3.X - p1.X,
 		D = p3.Y - p1.Y,
-		E = A * (p1.X + p2.X) + B * (p1.Y + p2.Y),
-		F = C * (p1.X + p3.X) + D * (p1.Y + p3.Y),
-		G = 2 * (A * (p3.Y - p2.Y) - B * (p3.X - p2.X)),
-		Cx = (D * E - B * F) / G,
-		Cy = (A * F - C * E) / G;
+		E = (A * (p1.X + p2.X)) + (B * (p1.Y + p2.Y)),
+		F = (C * (p1.X + p3.X)) + (D * (p1.Y + p3.Y)),
+		G = 2 * ((A * (p3.Y - p2.Y)) - (B * (p3.X - p2.X))),
+		Cx = ((D * E) - (B * F)) / G,
+		Cy = ((A * F) - (C * E)) / G;
 
 		return new(Cx, Cy);
 	}
@@ -260,25 +271,29 @@ public static class Common
 		}
 
 		while(true) {
-			for(int i = 0; i < pattern.Length; i++) {
-				if(pattern[i] == '+') yield return true;
-				if(pattern[i] == '-') yield return false;
+			for(var i = 0; i < pattern.Length; i++) {
+				if(pattern[i] == '+') {
+					yield return true;
+				}
+
+				if(pattern[i] == '-') {
+					yield return false;
+				}
 			}
 		}
 	}
 
 	public static float MinimalAngleBetweenAngles(float a1, float a2)
 	{
-		a1 = a1 % (2 * PI);
-		a2 = a2 % (2 * PI);
+		a1 %= 2 * PI;
+		a2 %= 2 * PI;
 
 		var dpositive = a2 - a1;
 		var dnegative = a1 - a2;
 
-		var dpositiveNorm = (a2 + 2 * PI) - a1;
-		var dnegativeNorm = (a1 + 2 * PI) - a2;
+		var dpositiveNorm = a2 + (2 * PI) - a1;
+		var dnegativeNorm = a1 + (2 * PI) - a2;
 
 		return Min(Min(Abs(dpositive), Abs(dnegative)), Min(Abs(dpositiveNorm), Abs(dnegativeNorm)));
 	}
-
 }

@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GraphicLibrary;
+﻿using GraphicLibrary;
 using GraphicLibrary.Models;
-using Microsoft.VisualBasic.Logging;
+using System.Drawing;
 using PointF = GraphicLibrary.MathModels.PointF;
 
 namespace InteractiveLibrary;
@@ -62,9 +56,9 @@ public class FallingBall // not struct coz we need refs
 public class PongCatcher : BitmapDrawer
 {
 	private IEnumerator<bool> _defaultPattern { get; init; }
-	private PointF _rightAndDown => new PointF(
-		this.PlatformWidth/2,
-		this.PlatformHeight/2);
+	private PointF _rightAndDown => new(
+		PlatformWidth / 2,
+		PlatformHeight / 2);
 	private Circle? DefeatCircle { get; set; }
 
 	public int PlatformWidth { get; private set; }
@@ -91,35 +85,42 @@ public class PongCatcher : BitmapDrawer
 		bool? useRandomColors = null)
 		: base(frameWidth, frameHeight)
 	{
-		this.PlatformWidth = platformWidth ?? frameWidth / 5;
-		this.PlatformHeight = platformHeight ?? frameHeight / 20;
-		this.PlatformBorderColor = platformBorderColor ?? Color.Red;
-		this.PlatformFillColor = platformFillColor ?? Color.OrangeRed;
-		this.PlatformLocation = new(0, frameHeight - 1 - PlatformHeight);
+		PlatformWidth = platformWidth ?? frameWidth / 5;
+		PlatformHeight = platformHeight ?? frameHeight / 20;
+		PlatformBorderColor = platformBorderColor ?? Color.Red;
+		PlatformFillColor = platformFillColor ?? Color.OrangeRed;
+		PlatformLocation = new(0, frameHeight - 1 - PlatformHeight);
 
-		this.BallAcceleration = ballAcceleration ?? frameHeight / 4;
-		this.BallRadius = ballRadius ?? frameWidth / 2 / (float)ballsCount;
-		this.BallBorderColor = ballBorderColor ?? Color.Blue;
-		this.BallFillColor = ballFillColor ?? Color.Aqua;
-
-
+		BallAcceleration = ballAcceleration ?? frameHeight / 4;
+		BallRadius = ballRadius ?? frameWidth / 2 / (float)ballsCount;
+		BallBorderColor = ballBorderColor ?? Color.Blue;
+		BallFillColor = ballFillColor ?? Color.Aqua;
 
 
-		this.UseRandomColors = useRandomColors ?? false;
 
-		this._defaultPattern = ALinearElement.GetDefaultPatternResolver();
-		this.FallingBalls = new();
+
+		UseRandomColors = useRandomColors ?? false;
+
+		_defaultPattern = ALinearElement.GetDefaultPatternResolver();
+		FallingBalls = new();
 	}
 
 	#region public
 	public void SetPlatformX(float x, bool correctLeftToCenter = true)
 	{
-		if(correctLeftToCenter) x -= PlatformWidth / 2;
+		if(correctLeftToCenter) {
+			x -= PlatformWidth / 2;
+		}
 
-		if(x < 0) x = 0;
-		if(x > FrameWidth - 1 - PlatformWidth) x = FrameWidth - 1 - PlatformWidth;
+		if(x < 0) {
+			x = 0;
+		}
 
-		this.PlatformLocation = new PointF(x, this.PlatformLocation.Y);
+		if(x > FrameWidth - 1 - PlatformWidth) {
+			x = FrameWidth - 1 - PlatformWidth;
+		}
+
+		PlatformLocation = new PointF(x, PlatformLocation.Y);
 	}
 	public void StartNewGame()
 	{
@@ -131,13 +132,15 @@ public class PongCatcher : BitmapDrawer
 
 		foreach(var ball in Balls) {
 			base.AddCircle(new(ball.Location, ball.Radius, ball.BorderColor, _defaultPattern));
-			if(!DisableBallFilling)
+			if(!DisableBallFilling) {
 				base.AddFiller(new(ball.Location, ball.FillColor));
+			}
 		}
 		foreach(var ball in FallingBalls) {
 			base.AddCircle(new(ball.Location, ball.Radius, ball.BorderColor, _defaultPattern));
-			if(!DisableBallFilling)
+			if(!DisableBallFilling) {
 				base.AddFiller(new(ball.Location, ball.FillColor));
+			}
 		}
 
 		if(DefeatCircle is not null) {
@@ -145,8 +148,8 @@ public class PongCatcher : BitmapDrawer
 		}
 
 		var platX = PlatformLocation.X;
-		var platformStart = new PointF(platX, this.FrameHeight - 1 - PlatformHeight);
-		var platformEnd = new PointF(platX + PlatformWidth, this.FrameHeight - 1);
+		var platformStart = new PointF(platX, FrameHeight - 1 - PlatformHeight);
+		var platformEnd = new PointF(platX + PlatformWidth, FrameHeight - 1);
 		base.AddRectangle(new(platformStart, platformEnd, PlatformBorderColor, _defaultPattern));
 		base.AddFiller(new(platformStart + _rightAndDown, PlatformFillColor));
 
@@ -162,25 +165,27 @@ public class PongCatcher : BitmapDrawer
 	}
 	private void ResetCurrentState()
 	{
-		int totalBalls = (int)(base.FrameWidth / 2 / BallRadius); // floor
+		var totalBalls = (int)(base.FrameWidth / 2 / BallRadius); // floor
 		Balls = new(totalBalls);
 		FallingBalls = new(3);
 		DefeatCircle = null;
 
 		var locY = BallRadius;
-		for(int i = 0; i < totalBalls; i++) {
-			float locX = BallRadius + i * 2 * BallRadius;
+		for(var i = 0; i < totalBalls; i++) {
+			var locX = BallRadius + (i * 2 * BallRadius);
 
 			Balls.Add(new(new(locX, locY), BallRadius) {
-				BorderColor = UseRandomColors ? GetRandomColor() : this.BallBorderColor,
-				FillColor = UseRandomColors ? GetRandomColor() : this.BallFillColor
+				BorderColor = UseRandomColors ? GetRandomColor() : BallBorderColor,
+				FillColor = UseRandomColors ? GetRandomColor() : BallFillColor
 			});
 		}
 	}
 
 	private void SetRandomBallToFalling()
 	{
-		if(Balls.Count == 0) return;
+		if(Balls.Count == 0) {
+			return;
+		}
 
 		var rnd = Random.Shared.Next(Balls.Count);
 
@@ -203,7 +208,7 @@ public class PongCatcher : BitmapDrawer
 		}
 
 		// step определяет "промежуток во времени" для смещения.
-		for(int i = 0; i < FallingBalls.Count; i++) {
+		for(var i = 0; i < FallingBalls.Count; i++) {
 			var ball = FallingBalls[i];
 			ball.Speed += BallAcceleration * step;
 			ball.Location += new PointF(0, ball.Speed);
@@ -212,15 +217,17 @@ public class PongCatcher : BitmapDrawer
 		// регистрация попадания
 		var minX = PlatformLocation.X;
 		var maxX = PlatformLocation.X + PlatformWidth;
-		for(int i = 0; i < FallingBalls.Count; i++) {
+		for(var i = 0; i < FallingBalls.Count; i++) {
 			var ball = FallingBalls[i];
-			if(ball.State == FallingBall.BallStates.Disposed) continue;
+			if(ball.State == FallingBall.BallStates.Disposed) {
+				continue;
+			}
 
 			var loc = ball.Location;
 			if(loc.Y > PlatformLocation.Y) {
 				if(loc.X >= minX && loc.X <= maxX) {
 					ball.State = FallingBall.BallStates.Disposed;
-					FallingBalls.Remove(ball);
+					_ = FallingBalls.Remove(ball);
 					i--;
 				} else {
 					DefeatCircle = new Circle(new(loc.X, PlatformLocation.Y), ball.Radius + 2, Color.Yellow);
@@ -229,8 +236,9 @@ public class PongCatcher : BitmapDrawer
 			}
 		}
 
-		if(Balls.Count == 0 && FallingBalls.Count == 0)
+		if(Balls.Count == 0 && FallingBalls.Count == 0) {
 			throw new GameWonException("Ты выиграл!");
+		}
 	}
 	#endregion
 }

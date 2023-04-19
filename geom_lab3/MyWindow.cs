@@ -1,22 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
-using static System.MathF;
-using OpenTK.Graphics.OpenGL4;
+﻿using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using OpenTK.Mathematics;
-using System.Windows.Media;
-using System.Windows.Forms;
+using System.Collections.Generic;
+using System.Linq;
 using Keys = OpenTK.Windowing.GraphicsLibraryFramework.Keys;
-using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
 
 namespace geom_lab3;
 public class MyWindow : GameWindow
@@ -24,9 +13,9 @@ public class MyWindow : GameWindow
 	private static float[] CalculateBarycentric(int verticesCount)
 	{
 		var n = verticesCount / 3 / 3; // 3 points of 3 coordinates
-		List<float> result = new List<float>(n);
+		var result = new List<float>(n);
 
-		for(int i = 0; i < n; i++) {
+		for(var i = 0; i < n; i++) {
 			result.AddRange(new float[] {
 				1, 0, 0,
 				0, 1, 0,
@@ -39,7 +28,7 @@ public class MyWindow : GameWindow
 	{
 		var result = new List<float>();
 
-		for(int i = 0; i < first.Length / 3; i++) {
+		for(var i = 0; i < first.Length / 3; i++) {
 			result.AddRange(first.Skip(3 * i).Take(3));
 			result.AddRange(second.Skip(3 * i).Take(3));
 		}
@@ -57,28 +46,27 @@ public class MyWindow : GameWindow
 	private bool useGrayPolys = false;
 
 	private readonly float[] VertsAndBaries;
-
-	int VBO;
-	int VAO;
-	Shader shader;
+	private int VBO;
+	private int VAO;
+	private readonly Shader shader;
 
 	public MyWindow(int width, int height, float[] vertices, string title = nameof(MyWindow))
 		: base(GameWindowSettings.Default, new() { Size = new(width, height), Title = title })
 	{
 		shader = new Shader("vert.glsl", "frag.glsl");
 
-		this.VertsAndBaries = ConcatVertsToBaries(vertices, CalculateBarycentric(vertices.Length));
+		VertsAndBaries = ConcatVertsToBaries(vertices, CalculateBarycentric(vertices.Length));
 	}
 
 	protected override void OnLoad()
 	{
 		base.OnLoad();
 
-		this.VBO = GL.GenBuffer();
+		VBO = GL.GenBuffer();
 		GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
 		GL.BufferData(BufferTarget.ArrayBuffer, VertsAndBaries.Length * sizeof(float), VertsAndBaries, BufferUsageHint.StaticDraw);
 
-		this.VAO = GL.GenVertexArray();
+		VAO = GL.GenVertexArray();
 		GL.BindVertexArray(VAO);
 
 		// 3 points and 3 barycentrices = stride is 6 * sizeof(float)
@@ -153,8 +141,9 @@ public class MyWindow : GameWindow
 				scale += 0.1f;
 			}
 			if(e.Key == Keys.Minus) {
-				if(scale > 0.1)
+				if(scale > 0.1) {
 					scale -= 0.09f;
+				}
 			}
 		}
 
@@ -166,7 +155,7 @@ public class MyWindow : GameWindow
 			useGrayPolys = !useGrayPolys;
 		}
 
-		this.SetAllUniforms();
+		SetAllUniforms();
 	}
 
 	protected override void OnResize(ResizeEventArgs e)

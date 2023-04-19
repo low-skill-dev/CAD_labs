@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PointF = GraphicLibrary.MathModels.PointF;
-
-namespace GraphicLibrary.MathModels;
+﻿namespace GraphicLibrary.MathModels;
 public class LineF : IEquatable<LineF>, IEquatable<PointF>
 {
 	public PointF Start;
@@ -33,13 +25,13 @@ public class LineF : IEquatable<LineF>, IEquatable<PointF>
 
 	public bool Equals(LineF other)
 	{
-		return this.Start.Equals(other.Start)
-			&& this.End.Equals(other.End);
+		return Start.Equals(other.Start)
+			&& End.Equals(other.End);
 	}
 
 	public bool Equals(PointF other)
 	{
-		return this.Start.Equals(other)
-			&& this.End.Equals(other);
+		return Start.Equals(other)
+			&& End.Equals(other);
 	}
 }
