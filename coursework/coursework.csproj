@@ -17,4 +17,8 @@
     <ProjectReference Include="..\GraphicLibrary\GraphicLibrary.csproj" />
   </ItemGroup>
 
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
+
 </Project>

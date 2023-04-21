@@ -29,7 +29,7 @@ public static class Capture
 			);
 	}
 
-	private static bool IsInBounds(RectangleF rect, PointF point)
+	public static bool IsInBounds(RectangleF rect, PointF point)
 	{
 		var (minX, minY, maxX, maxY) = GetBounds(rect);
 
@@ -40,7 +40,7 @@ public static class Capture
 		return true;
 	}
 
-	private static bool isValidPoint(PointF target, SizeF Rect)
+	public static bool isValidPoint(PointF target, SizeF Rect)
 	{
 		if(!(float.IsFinite(target.X) && float.IsFinite(target.Y))) {
 			return false;
@@ -61,7 +61,7 @@ public static class Capture
 		return true;
 	}
 
-	internal static bool IsCaptured(RectangleF captureRect, ArcF arc, bool partialCaptureMode = false)
+	public static bool IsCaptured(RectangleF captureRect, ArcF arc, bool partialCaptureMode = false)
 	{
 		var startA = arc.StartAngle;
 		var endA = arc.EndAngle;

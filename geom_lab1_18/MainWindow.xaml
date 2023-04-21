@@ -1,0 +1,24 @@
+﻿<Window x:Class="geom_lab1_18.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:geom_lab1"
+        mc:Ignorable="d"
+        Title="MainWindow" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
+	<Grid>
+		<StackPanel Orientation="Horizontal" Width="1200">
+			<StackPanel Orientation="Vertical" Width="300">
+				<StackPanel Orientation="Horizontal">
+					<Label FontSize="16" Width="200">
+						Время
+					</Label>
+					<TextBox FontSize="16" Name="TotalRoundsTB" Width="100"></TextBox>
+				</StackPanel>
+				<Button Click="StartNewGameBT_Click" Name="StartNewGameBT" FontSize="16">Начать новую игру</Button>
+				<TextBox IsReadOnly="True" Name="Player_message" Foreground="Red" FontWeight="Bold" FontSize="12"></TextBox>
+			</StackPanel>
+			<Image Name="GameImage" Width="900" Height="600" MouseMove="GameImage_MouseMove"></Image>
+		</StackPanel>
+	</Grid>
+</Window>
