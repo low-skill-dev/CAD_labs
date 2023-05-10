@@ -13,6 +13,21 @@ namespace lab7;
 
 public partial class MainWindow : Window
 {
+	//TODO: delete this
+	public static float TrapezoidalArea(GraphicLibrary.MathModels.PointF[] points)
+	{
+		float area = 0;
+		for(int i = 0; i < points.Length; i++) {
+			int j = (i + 1) % points.Length;
+			float height = MathF.Abs(points[j].Y - points[i].Y);
+			float base1 = points[i].X;
+			float base2 = points[j].X;
+			float trapArea = (base1 + base2) * height / 2;
+			area += trapArea;
+		}
+		return area;
+	}
+
 	private enum States
 	{
 		WaitingFirstPoint,
@@ -111,6 +126,15 @@ public partial class MainWindow : Window
 
 			PerimeterOut.Text = Common.FindPerimeter(_lines).ToString();
 			AreaOut.Text = Common.FindArea(_lines).ToString();
+
+
+			var actual = Common.FindArea(_lines);
+			var expected = TrapezoidalArea(_lines.Select(x => x.End).ToArray());
+			var sqrE = this.Height / 2 * this.Width / 2;
+			if((int)MathF.Round(actual) != (int)MathF.Round(expected)) {
+				//throw new AggregateException();
+			}
+
 		} catch { }
 	}
 
